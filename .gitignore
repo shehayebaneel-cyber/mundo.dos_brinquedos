@@ -1,0 +1,21 @@
+# deps
+node_modules/
+# builds
+dist/
+build/
+# env / secrets
+.env
+.env.*
+!.env.example
+# logs
+*.log
+npm-debug.log*
+# tooling / test artifacts
+.playwright-mcp/
+*.png
+!web/public/**
+# editor / os
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

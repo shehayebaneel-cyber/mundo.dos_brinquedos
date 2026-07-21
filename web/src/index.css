@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Mundo dos Brinquedos e Variedades — Design system (Direction B · "Confete")
+   Warm off-white ground · confident coral-red hero · confetti accents.
+   Professional & trustworthy, joyful through accents — not childish backgrounds.
+   ========================================================================== */
+@theme {
+  /* --- brand: coral-red hero (CTAs, prices, sale) --- */
+  --color-brand: #ff3d57;
+  --color-brand-dark: #e11d3f;
+  --color-brand-darker: #b8162f;
+  --color-brand-soft: #ffe1e6;
+
+  /* --- ink & neutrals (warm, chosen — not pure grey) --- */
+  --color-ink: #241f3b;
+  --color-muted: #6b6580;
+  --color-cream: #fff7f2;
+  --color-surface: #ffffff;
+  --color-surface-2: #fbf7f3;
+  --color-line: #ece3db;
+
+  /* --- confetti accents (category coding, used sparingly) --- */
+  --color-sun: #ffc53d;
+  --color-sky: #3da5ff;
+  --color-mint: #21c197;
+  --color-grape: #8b5cf6;
+
+  /* --- semantic --- */
+  --color-pix: #129d63; /* Pix / success green */
+  --color-danger: #e11d3f;
+  --color-warn: #e08a00;
+
+  /* --- type --- */
+  --font-display: "Baloo 2", system-ui, -apple-system, sans-serif;
+  --font-body: "Nunito", system-ui, -apple-system, sans-serif;
+
+  /* --- radii & shadow --- */
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  --shadow-card: 0 6px 24px -12px rgba(36, 31, 59, 0.28);
+  --shadow-pop: 0 16px 40px -18px rgba(36, 31, 59, 0.45);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.12;
+    text-wrap: balance;
+    margin: 0;
+  }
+  p { margin: 0; }
+  /* Brazilian Real amounts and quantities line up in columns */
+  .tabular { font-variant-numeric: tabular-nums; }
+  :focus-visible {
+    outline: 3px solid var(--color-sky);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  /* Compose in markup as `btn btn-primary` / `btn btn-ghost` */
+  .btn-primary {
+    @apply bg-brand text-white hover:bg-brand-dark active:bg-brand-darker;
+  }
+  .btn-ghost {
+    @apply border border-line bg-surface text-ink hover:bg-surface-2;
+  }
+  .card {
+    @apply rounded-[16px] border border-line bg-surface shadow-[0_6px_24px_-12px_rgba(36,31,59,0.28)];
+  }
+  .chip {
+    @apply inline-flex items-center whitespace-nowrap rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-bold text-ink transition-colors;
+  }
+  .chip-active {
+    @apply border-brand bg-brand text-white;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
