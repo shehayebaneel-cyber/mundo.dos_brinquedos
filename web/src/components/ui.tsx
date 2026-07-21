@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Product } from "../lib/types";
+import { useI18n } from "../lib/i18n";
 import { ProductCard } from "./ProductCard";
 
 // gradient by design-token name
@@ -12,6 +13,7 @@ export const grad: Record<string, string> = {
 };
 
 export function SectionHead({ title, emoji, to, extra }: { title: string; emoji?: string; to?: string; extra?: React.ReactNode }) {
+  const { t } = useI18n();
   return (
     <div className="mb-3 flex items-end justify-between gap-2 px-1">
       <h2 className="font-display text-xl font-extrabold text-ink sm:text-2xl">
@@ -21,7 +23,7 @@ export function SectionHead({ title, emoji, to, extra }: { title: string; emoji?
       {extra}
       {to && (
         <Link to={to} className="whitespace-nowrap text-sm font-bold text-brand-dark">
-          Ver todos →
+          {t("Ver todos")} →
         </Link>
       )}
     </div>
@@ -30,7 +32,7 @@ export function SectionHead({ title, emoji, to, extra }: { title: string; emoji?
 
 // Horizontal scroll row of product cards (mobile), grid-ish on desktop.
 export function ProductRow({ items }: { items: Product[] }) {
-  if (!items.length) return <p className="px-1 text-sm text-muted">Nenhum produto por aqui ainda.</p>;
+  if (!items.length) return <p className="px-1 text-sm text-muted">—</p>;
   return (
     <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
       {items.map((p) => (

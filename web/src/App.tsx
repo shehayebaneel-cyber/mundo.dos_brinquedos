@@ -1,4 +1,5 @@
 import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
+import { I18nProvider, useI18n } from "./lib/i18n";
 import { StoreProvider } from "./lib/store";
 import { CartProvider } from "./lib/cart";
 import { WishlistProvider } from "./lib/wishlist";
@@ -23,11 +24,12 @@ import { AdminReviews } from "./pages/admin/AdminReviews";
 import { AdminContent } from "./pages/admin/AdminContent";
 
 function NotFound() {
+  const { t } = useI18n();
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-6xl">🧸</p>
-      <h1 className="mt-3 font-display text-2xl font-extrabold text-ink">Página não encontrada</h1>
-      <Link to="/" className="btn btn-primary mt-4 px-6 py-3">Voltar à loja</Link>
+      <h1 className="mt-3 font-display text-2xl font-extrabold text-ink">{t("Página não encontrada")}</h1>
+      <Link to="/" className="btn btn-primary mt-4 px-6 py-3">{t("Voltar à loja")}</Link>
     </div>
   );
 }
@@ -80,12 +82,14 @@ const router = createBrowserRouter([
 
 export default function App() {
   return (
-    <StoreProvider>
-      <WishlistProvider>
-        <CartProvider>
-          <RouterProvider router={router} />
-        </CartProvider>
-      </WishlistProvider>
-    </StoreProvider>
+    <I18nProvider>
+      <StoreProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <RouterProvider router={router} />
+          </CartProvider>
+        </WishlistProvider>
+      </StoreProvider>
+    </I18nProvider>
   );
 }

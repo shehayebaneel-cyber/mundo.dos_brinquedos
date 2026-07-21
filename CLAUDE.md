@@ -58,9 +58,31 @@ wholesale access.
 - **Future (structured for, not built):** loyalty, gift cards, bundles, multi-location,
   sales reps, supplier portal, multi-language, marketplace.
 
+## Running the prototype
+- API: `cd server && npm run start` (port 4210). DB is SQLite `server/prisma/dev.db`
+  (committed so it runs immediately). Reset demo data: `cd server && npx tsx prisma/seed.ts`.
+- Web: `cd web && npm run dev` (port 5310). Admin at `/admin`, key **mundo123**
+  (from server `.env` ADMIN_KEY). Storefront at `/`.
+
+## Languages (bilingual)
+- Storefront is **PT (default) + EN**, toggle in the header (🇧🇷/🇺🇸), persisted in
+  localStorage (`mundo_lang`). i18n lives in web/src/lib/i18n.tsx — a PT-source
+  overlay: PT strings are the keys, `t()` returns the EN value in English mode,
+  `tf(obj,"name")` picks `nameEn`/`descriptionEn`/`blurbEn`/banner `*En` fields.
+- DB has English columns (Product.nameEn/descriptionEn, Category.nameEn/blurbEn,
+  Banner.*En, Setting taglineEn) seeded for all sample data. Admin stays Portuguese.
+- User-generated review text stays in its original language (by design).
+
 ## Current status / next up
-- ✅ Sitemap + mobile home concept + design directions delivered (artifact).
-- ✅ web/ scaffolded; Direction B design system locked & verified (screenshot 390px OK).
-- ⏭ Scaffold server/ + Prisma data model (products, categories, orders, users) for Fase 1.
-- ⏭ Core components (Button, ProductCard, Header, BottomNav) with all states.
-- ⏭ Home + product + cart + checkout prototype → client sign-off before building the rest.
+- ✅ Sitemap + concept + design directions delivered; Direction B chosen.
+- ✅ web/ + design system locked & verified.
+- ✅ Bilingual PT/EN storefront (toggle, translated UI + product/category/banner content).
+- ✅ **Full working prototype (this milestone):** server + Prisma model + rich seed
+  (20 products, variants, 6 customers, 8 orders, 12 reviews, banners, settings) +
+  public & admin API; storefront (home/shop/product/cart/checkout/confirmation/track/
+  atacado/favoritos/static+policies+LGPD); admin (dashboard/products CRUD/orders/
+  customers/wholesale/reviews/content). All DB-backed & editable. Verified 390px+1280px.
+- ⏭ Fase 1 → launch: real Mercado Pago (Pix/card/webhook), real product data + photos,
+  migrate SQLite→Neon Postgres, deploy (Render API + Vercel web) — ASK before first deploy.
+- ⏭ Fase 2: wholesale price gating by approved login, coupons/offers countdown,
+  reviews moderation polish, CEP shipping calc, customer accounts, reports.

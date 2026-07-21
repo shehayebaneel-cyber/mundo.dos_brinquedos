@@ -64,6 +64,7 @@ app.get("/api/products", asyncH(async (req, res) => {
     const term = String(q);
     where.OR = [
       { name: { contains: term } },
+      { nameEn: { contains: term } },
       { brand: { contains: term } },
       { sku: { contains: term } },
       { description: { contains: term } },

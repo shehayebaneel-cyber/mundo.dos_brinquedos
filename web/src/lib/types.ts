@@ -1,15 +1,16 @@
 export type ProductImage = { id: number; url: string; alt: string; sortOrder: number };
 export type Variant = { id: number; kind: string; label: string; swatch: string; stock: number; priceDeltaCents: number };
 export type Category = {
-  id: number; slug: string; name: string; emoji: string; accent: string; blurb: string;
-  sortOrder: number; active: boolean; _count?: { products: number };
+  id: number; slug: string; name: string; nameEn?: string; emoji: string; accent: string;
+  blurb: string; blurbEn?: string; sortOrder: number; active: boolean; _count?: { products: number };
 };
 export type Review = {
   id: number; productId: number; author: string; rating: number; comment: string;
   verified: boolean; approved: boolean; createdAt: string; product?: { name: string; slug: string };
 };
 export type Product = {
-  id: number; slug: string; name: string; brand: string; sku: string; description: string;
+  id: number; slug: string; name: string; nameEn?: string; brand: string; sku: string;
+  description: string; descriptionEn?: string;
   categoryId: number | null; category?: Category | null;
   priceCents: number; oldPriceCents: number | null; costCents: number; wholesaleCents: number | null;
   pixPercent: number; stock: number; lowStockAt: number; minWholesaleQty: number; packQty: number;
@@ -18,8 +19,10 @@ export type Product = {
   images: ProductImage[]; variants: Variant[]; reviews?: Review[]; createdAt: string; updatedAt: string;
 };
 export type Banner = {
-  id: number; title: string; subtitle: string; badge: string; ctaLabel: string; ctaHref: string;
-  cta2Label: string; cta2Href: string; bg: string; emoji: string; sortOrder: number; active: boolean;
+  id: number; title: string; titleEn?: string; subtitle: string; subtitleEn?: string;
+  badge: string; badgeEn?: string; ctaLabel: string; ctaLabelEn?: string; ctaHref: string;
+  cta2Label: string; cta2LabelEn?: string; cta2Href: string; bg: string; emoji: string;
+  sortOrder: number; active: boolean;
 };
 export type OrderItem = { id: number; productId: number | null; name: string; variant: string; priceCents: number; qty: number };
 export type Order = {

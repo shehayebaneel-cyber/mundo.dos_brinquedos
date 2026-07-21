@@ -16,9 +16,11 @@ model Category {
   id        Int        @id @default(autoincrement())
   slug      String     @unique
   name      String
+  nameEn    String     @default("")
   emoji     String     @default("🧸")
   accent    String     @default("brand") // token: brand|sun|sky|mint|grape
   blurb     String     @default("")
+  blurbEn   String     @default("")
   parentId  Int?
   parent    Category?  @relation("Sub", fields: [parentId], references: [id])
   children  Category[] @relation("Sub")
@@ -32,9 +34,11 @@ model Product {
   id              Int              @id @default(autoincrement())
   slug            String           @unique
   name            String
+  nameEn          String           @default("")
   brand           String           @default("")
   sku             String           @default("")
   description     String           @default("")
+  descriptionEn   String           @default("")
   categoryId      Int?
   category        Category?        @relation(fields: [categoryId], references: [id])
   priceCents      Int // retail current price (centavos)
@@ -153,14 +157,19 @@ model Review {
 }
 
 model Banner {
-  id        Int      @id @default(autoincrement())
-  title     String
-  subtitle  String   @default("")
-  badge     String   @default("")
-  ctaLabel  String   @default("")
-  ctaHref   String   @default("")
-  cta2Label String   @default("")
-  cta2Href  String   @default("")
+  id         Int      @id @default(autoincrement())
+  title      String
+  titleEn    String   @default("")
+  subtitle   String   @default("")
+  subtitleEn String   @default("")
+  badge      String   @default("")
+  badgeEn    String   @default("")
+  ctaLabel   String   @default("")
+  ctaLabelEn String   @default("")
+  ctaHref    String   @default("")
+  cta2Label  String   @default("")
+  cta2LabelEn String  @default("")
+  cta2Href   String   @default("")
   bg        String   @default("brand") // gradient token
   emoji     String   @default("🧸")
   sortOrder Int      @default(0)

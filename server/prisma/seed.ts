@@ -17,6 +17,41 @@ const BG: Record<string, string> = {
   presentes: "#ffeede",
 };
 
+// English translations (full-storefront bilingual). Keyed by slug.
+const CAT_EN: Record<string, { name: string; blurb: string }> = {
+  bonecas: { name: "Dolls", blurb: "Dolls, reborn babies and fashion dolls." },
+  carrinhos: { name: "Toy Cars", blurb: "Remote control, tracks and miniatures." },
+  bicicletas: { name: "Bikes & Scooters", blurb: "Bikes, scooters and trikes." },
+  educativos: { name: "Educational Toys", blurb: "Build, learn and create." },
+  bebes: { name: "For Babies", blurb: "Early childhood, made safe." },
+  games: { name: "Games", blurb: "Consoles and accessories." },
+  garrafas: { name: "Bottles & Accessories", blurb: "Bottles, squeezes and thermal flasks." },
+  presentes: { name: "Gifts & New In", blurb: "Gift ideas for every age." },
+};
+
+const PROD_EN: Record<string, { name: string; desc: string }> = {
+  "boneca-bebe-reborn-realista": { name: "Realistic Reborn Baby Doll 48cm", desc: "Ultra-realistic reborn baby doll with a soft body and hand-painted details. Comes with an outfit, pacifier and a symbolic birth certificate. A charming gift that nurtures care and imagination." },
+  "boneca-fashion-cabelo-magico": { name: "Magic Hair Fashion Doll", desc: "Fashion doll whose hair changes colour in warm water. Includes styling accessories and outfits for salon role-play." },
+  "carrinho-controle-4x4-offroad": { name: "4x4 Off-Road Remote Control Car", desc: "4x4 remote control car with four-wheel drive, suspension and rubber tyres for any terrain. 30m range, USB rechargeable." },
+  "pista-super-looping": { name: "Super Looping Track with 2 Cars", desc: "Radical track with a 360° loop, turbo launcher and 2 cars included. Easy to assemble and expandable with other tracks in the line." },
+  "caminhao-cacamba-grande": { name: "Large Dump Truck 60cm", desc: "Big dump truck that really lifts and tips. Sturdy for backyard and sandbox play." },
+  "bicicleta-infantil-aro-16": { name: "Kids Bike 16-inch", desc: "Children's 16-inch bike with removable training wheels, front and rear brakes and a basket. Strong steel frame with durable paint." },
+  "patinete-3-rodas-luz": { name: "3-Wheel Scooter with Lights", desc: "3-wheel scooter with light-up wheels, a height-adjustable handlebar and a folding frame. Supports up to 50kg." },
+  "blocos-montar-200-pecas": { name: "Educational Building Blocks 200 Pieces", desc: "200 colourful pieces compatible with the leading brands. Builds coordination, creativity and logic. Comes with a storage case." },
+  "quebra-cabeca-mundo-animal-500": { name: "Animal Kingdom Puzzle 500 Pieces", desc: "500-piece jigsaw with a vibrant animal-kingdom illustration. Perfectly interlocking pieces, great for the whole family." },
+  "mesa-atividades-educativa": { name: "Musical Educational Activity Table", desc: "Interactive table with sounds, lights, shapes and numbers. Removable legs for floor or standing play. First learning through play." },
+  "mobile-musical-berco": { name: "Musical Crib Mobile", desc: "Musical mobile with spinning plush animals and gentle melodies to soothe your baby. Universal crib attachment." },
+  "chocalho-kit-5-pecas": { name: "Rattle & Teether Kit 5 Pieces", desc: "Kit with 5 soft silicone rattles and teethers, BPA-free. Contrasting colours that stimulate baby's vision." },
+  "console-portatil-400-jogos": { name: "Retro Handheld Console 400 Games", desc: "Portable game console with a 3\" colour screen, 400 built-in classic games and TV output. Long-lasting rechargeable battery." },
+  "controle-gamer-sem-fio": { name: "Wireless Gamepad", desc: "Wireless controller compatible with PC and consoles, with dual vibration and a rechargeable battery. Stable connection up to 8 metres." },
+  "kit-slime-faca-voce-mesmo": { name: "DIY Slime Kit", desc: "Complete kit to make slime at home: coloured glues, glitter, activator and pots. Safe, hands-on sensory fun." },
+  "garrafa-termica-infantil-500": { name: "Kids Thermal Bottle 500ml", desc: "Stainless steel kids' thermal bottle, keeps the temperature for up to 12h. Straw lid, strap and fun prints. BPA-free." },
+  "squeeze-esportivo-750": { name: "Sports Water Bottle 750ml", desc: "750ml sports bottle in tough Tritan, with a flip spout and volume markings. Perfect for school and sports." },
+  "pelucia-urso-gigante-90": { name: "Giant Teddy Bear 90cm", desc: "90cm giant teddy bear, super soft and huggable. Hypoallergenic filling and reinforced stitching. The gift everyone loves." },
+  "kit-presente-surpresa-menina": { name: "Surprise Gift Box for Girls", desc: "Surprise box with a selection of toys, accessories and treats for girls. A burst of joy — a great gift idea." },
+  "triciclo-velotrol-empurrador": { name: "Push Tricycle with Parent Handle", desc: "3-in-1 tricycle with a parent push handle, safety belt, removable canopy and basket. Grows with your child." },
+};
+
 async function main() {
   console.log("🌱 Limpando dados…");
   await db.orderItem.deleteMany();
@@ -34,6 +69,7 @@ async function main() {
   const settings: Record<string, string> = {
     storeName: "Mundo dos Brinquedos e Variedades",
     tagline: "Varejo e atacado · entrega para todo o Brasil",
+    taglineEn: "Retail & wholesale · delivery across Brazil",
     whatsapp: "5562981652030",
     whatsappLabel: "+55 62 98165-2030",
     hours: "Seg a Sáb, 08:00–18:00",
@@ -64,7 +100,8 @@ async function main() {
   ];
   const catId: Record<string, number> = {};
   for (let i = 0; i < cats.length; i++) {
-    const c = await db.category.create({ data: { ...cats[i], sortOrder: i } });
+    const en = CAT_EN[cats[i].slug];
+    const c = await db.category.create({ data: { ...cats[i], nameEn: en?.name ?? "", blurbEn: en?.blurb ?? "", sortOrder: i } });
     catId[c.slug] = c.id;
   }
 
@@ -222,9 +259,11 @@ async function main() {
 
   const prodBySlug: Record<string, number> = {};
   for (const p of products) {
+    const en = PROD_EN[p.slug];
     const created = await db.product.create({
       data: {
-        slug: p.slug, name: p.name, brand: p.brand, sku: p.sku, description: p.desc,
+        slug: p.slug, name: p.name, nameEn: en?.name ?? "", brand: p.brand, sku: p.sku,
+        description: p.desc, descriptionEn: en?.desc ?? "",
         categoryId: catId[p.cat],
         priceCents: r(p.price), oldPriceCents: p.old ? r(p.old) : null, costCents: r(p.cost),
         wholesaleCents: p.wholesale ? r(p.wholesale) : null, minWholesaleQty: p.minW ?? 0,
@@ -313,9 +352,9 @@ async function main() {
   // ---------- BANNERS ----------
   await db.banner.createMany({
     data: [
-      { title: "Diversão que chega em todo o Brasil", subtitle: "Varejo e atacado · entrega nacional", badge: "💠 Pix com desconto", ctaLabel: "Comprar agora", ctaHref: "/produtos", cta2Label: "Ver ofertas", cta2Href: "/ofertas", bg: "brand", emoji: "🧸", sortOrder: 0, active: true },
-      { title: "Novidades toda semana", subtitle: "As últimas tendências em brinquedos", badge: "✨ Recém-chegados", ctaLabel: "Ver novidades", ctaHref: "/produtos?flag=novidades", bg: "grape", emoji: "🎈", sortOrder: 1, active: true },
-      { title: "É lojista? Compre no atacado", subtitle: "Preços especiais a partir de R$ 300", badge: "📦 Atacado", ctaLabel: "Criar conta atacado", ctaHref: "/atacado", cta2Label: "Falar no WhatsApp", cta2Href: "whatsapp", bg: "mint", emoji: "🛒", sortOrder: 2, active: true },
+      { title: "Diversão que chega em todo o Brasil", titleEn: "Fun delivered across Brazil", subtitle: "Varejo e atacado · entrega nacional", subtitleEn: "Retail & wholesale · nationwide delivery", badge: "💠 Pix com desconto", badgeEn: "💠 Pix discount", ctaLabel: "Comprar agora", ctaLabelEn: "Shop now", ctaHref: "/produtos", cta2Label: "Ver ofertas", cta2LabelEn: "See deals", cta2Href: "/ofertas", bg: "brand", emoji: "🧸", sortOrder: 0, active: true },
+      { title: "Novidades toda semana", titleEn: "New arrivals every week", subtitle: "As últimas tendências em brinquedos", subtitleEn: "The latest toy trends", badge: "✨ Recém-chegados", badgeEn: "✨ Just in", ctaLabel: "Ver novidades", ctaLabelEn: "See what's new", ctaHref: "/produtos?flag=novidades", bg: "grape", emoji: "🎈", sortOrder: 1, active: true },
+      { title: "É lojista? Compre no atacado", titleEn: "Own a shop? Buy wholesale", subtitle: "Preços especiais a partir de R$ 300", subtitleEn: "Special prices from R$ 300", badge: "📦 Atacado", badgeEn: "📦 Wholesale", ctaLabel: "Criar conta atacado", ctaLabelEn: "Create wholesale account", ctaHref: "/atacado", cta2Label: "Falar no WhatsApp", cta2LabelEn: "Chat on WhatsApp", cta2Href: "whatsapp", bg: "mint", emoji: "🛒", sortOrder: 2, active: true },
     ],
   });
 

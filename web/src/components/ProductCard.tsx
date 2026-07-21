@@ -3,11 +3,13 @@ import type { Product } from "../lib/types";
 import { brl, discountPct, installment, pixCents } from "../lib/money";
 import { useCart } from "../lib/cart";
 import { useWishlist } from "../lib/wishlist";
+import { useI18n } from "../lib/i18n";
 import { Thumb } from "./Thumb";
 
 export function ProductCard({ p }: { p: Product }) {
   const cart = useCart();
   const wish = useWishlist();
+  const { t, tf } = useI18n();
   const nav = useNavigate();
   const off = discountPct(p.oldPriceCents, p.priceCents);
   const inst = installment(p.priceCents, p.installmentsMax);
@@ -34,7 +36,7 @@ export function ProductCard({ p }: { p: Product }) {
         <Thumb url={p.images[0]?.url} alt={p.name} emojiSize="text-6xl" />
         <div className="absolute left-2 top-2 flex flex-col gap-1">
           {off > 0 && <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-extrabold text-white">-{off}%</span>}
-          {p.isNew && <span className="rounded-full bg-grape px-2 py-0.5 text-[11px] font-extrabold text-white">Novo</span>}
+          {p.isNew && <span className="rounded-full bg-grape px-2 py-0.5 text-[11px] font-extrabold text-white">{t("Novo")}</span>}
           {p.bestSeller && !p.isNew && <span className="rounded-full bg-sun px-2 py-0.5 text-[11px] font-extrabold text-ink">Top</span>}
         </div>
         <button
@@ -51,20 +53,20 @@ export function ProductCard({ p }: { p: Product }) {
 
       <div className="flex flex-1 flex-col p-3">
         {p.brand && <span className="text-[11px] font-bold uppercase tracking-wide text-muted">{p.brand}</span>}
-        <h3 className="line-clamp-2 min-h-[2.4em] text-sm font-semibold leading-tight text-ink">{p.name}</h3>
+        <h3 className="line-clamp-2 min-h-[2.4em] text-sm font-semibold leading-tight text-ink">{tf(p, "name")}</h3>
 
         <div className="mt-1.5">
           {p.oldPriceCents && <span className="mr-1 text-xs text-muted line-through tabular">{brl(p.oldPriceCents)}</span>}
           <div className="font-display text-lg font-extrabold text-ink tabular">{brl(p.priceCents)}</div>
           <div className="text-[11px] text-muted tabular">
-            {inst.n}x de {brl(inst.eachCents)}
+            {inst.n}x {brl(inst.eachCents)}
           </div>
-          <div className="text-[11px] font-bold text-pix tabular">{brl(pixCents(p.priceCents, p.pixPercent))} no Pix</div>
+          <div className="text-[11px] font-bold text-pix tabular">{brl(pixCents(p.priceCents, p.pixPercent))} {t("no Pix")}</div>
         </div>
 
         <div className="mt-2 flex items-center justify-between">
           <span className={`text-[11px] font-bold ${out ? "text-danger" : low ? "text-warn" : "text-pix"}`}>
-            {out ? "● Esgotado" : low ? `● Últimas ${p.stock}` : "● Em estoque"}
+            {out ? `● ${t("Esgotado")}` : low ? `● ${t("Últimas {n}", { n: p.stock })}` : `● ${t("Em estoque")}`}
           </span>
         </div>
 
@@ -73,7 +75,7 @@ export function ProductCard({ p }: { p: Product }) {
           disabled={out}
           className="btn btn-primary mt-2.5 w-full py-2 text-sm disabled:bg-line disabled:text-muted"
         >
-          {out ? "Indisponível" : hasVariants ? "Escolher opções" : "+ Adicionar"}
+          {out ? t("Indisponível") : hasVariants ? t("Escolher opções") : t("+ Adicionar")}
         </button>
       </div>
     </Link>

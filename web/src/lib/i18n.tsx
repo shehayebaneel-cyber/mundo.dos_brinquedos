@@ -1,0 +1,358 @@
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+
+export type Lang = "pt" | "en";
+
+// English overlay keyed by the Portuguese source string.
+// t("Ofertas") → "Deals" when lang==="en", otherwise returns the PT key itself.
+const EN: Record<string, string> = {
+  // header / nav
+  "Buscar brinquedos, bonecas, bicicletas…": "Search toys, dolls, bikes…",
+  "Buscar brinquedos, bonecas…": "Search toys, dolls…",
+  "Ofertas": "Deals",
+  "Atacado": "Wholesale",
+  "Categorias": "Categories",
+  "Todos os produtos": "All products",
+  "Minha conta": "My account",
+  "Rastrear pedido": "Track order",
+  "Início": "Home",
+  "Buscar": "Search",
+  "Carrinho": "Cart",
+  "Ver todos": "View all",
+  "Ver todas": "View all",
+  "Ver mais": "View more",
+  "Fechar": "Close",
+  "Abrir menu": "Open menu",
+  "Favoritos": "Favorites",
+  // cookie
+  "🍪 Usamos cookies para melhorar sua experiência, lembrar seu carrinho e personalizar ofertas. Ao continuar, você concorda com nossa": "🍪 We use cookies to improve your experience, remember your cart and personalise offers. By continuing, you agree to our",
+  "Política de Cookies": "Cookie Policy",
+  "Aceitar": "Accept",
+  "Saber mais": "Learn more",
+  // trust
+  "Entrega para todo o Brasil": "Delivery across Brazil",
+  "Pagamento seguro": "Secure payment",
+  "Atacado e varejo": "Wholesale & retail",
+  "Atendimento no WhatsApp": "WhatsApp support",
+  "Produtos selecionados": "Curated products",
+  // home sections
+  "Mais vendidos": "Best sellers",
+  "Ofertas do dia": "Today's deals",
+  "Novidades": "New arrivals",
+  "Em destaque": "Featured",
+  "🧸📦 Compre no atacado": "🧸📦 Buy wholesale",
+  "Preços especiais para lojistas e revendedores. Pedido mínimo de {min} · entrega para todo o Brasil.": "Special prices for retailers and resellers. Minimum order {min} · delivery across Brazil.",
+  "Criar conta atacado": "Create wholesale account",
+  "💬 Falar com o atacado": "💬 Chat with wholesale",
+  "Siga-nos no Instagram": "Follow us on Instagram",
+  "Receba ofertas e cupons 🎉": "Get offers & coupons 🎉",
+  "Novidades, promoções e descontos no seu e-mail ou WhatsApp.": "News, promos and discounts by email or WhatsApp.",
+  "Seu e-mail ou WhatsApp": "Your email or WhatsApp",
+  "Quero!": "Sign up!",
+  "Prontinho! Você vai receber nossas novidades. 💌": "All set! You'll get our updates. 💌",
+  "Carregando a lojinha…": "Loading the store…",
+  "Você também pode gostar": "You may also like",
+  // product card
+  "Novo": "New",
+  "Em estoque": "In stock",
+  "Esgotado": "Sold out",
+  "no Pix": "via Pix",
+  "Últimas {n}": "Only {n} left",
+  "Últimas {n} unidades": "Only {n} left",
+  "+ Adicionar": "+ Add",
+  "Escolher opções": "Choose options",
+  "Indisponível": "Unavailable",
+  // shop
+  "Ordenar por": "Sort by",
+  "Relevância": "Relevance",
+  "Menor preço": "Lowest price",
+  "Maior preço": "Highest price",
+  "Maiores descontos": "Biggest discounts",
+  "Filtrar": "Filter",
+  "Com desconto": "On sale",
+  "Preço máximo": "Max price",
+  "qualquer": "any",
+  "⚙️ Filtros": "⚙️ Filters",
+  "Nenhum produto encontrado": "No products found",
+  "Tente remover alguns filtros ou buscar outro termo.": "Try removing some filters or searching another term.",
+  "Filtros": "Filters",
+  'Busca: "{q}"': 'Search: "{q}"',
+  "produto": "product",
+  "produtos": "products",
+  "Ver {n} produtos": "View {n} products",
+  // product page
+  "em até {n}x de {each} sem juros": "in up to {n}x of {each} interest-free",
+  "selecione": "select",
+  "Adicionar ao carrinho": "Add to cart",
+  "✓ Adicionado!": "✓ Added!",
+  "Comprar agora": "Buy now",
+  "Selecione as opções acima para continuar.": "Select the options above to continue.",
+  "💬 Tirar dúvida no WhatsApp": "💬 Ask on WhatsApp",
+  "🚚 Calcular frete e prazo": "🚚 Calculate shipping & time",
+  "Digite seu CEP": "Enter your postcode (CEP)",
+  "Calcular": "Calculate",
+  "Frete grátis": "Free shipping",
+  "Retirada grátis na loja em Goiânia disponível.": "Free store pickup in Goiânia available.",
+  "Descrição": "Description",
+  "Informações do produto": "Product information",
+  "Marca": "Brand",
+  "Idade recomendada": "Recommended age",
+  "Material": "Material",
+  "Peso": "Weight",
+  "Garantia": "Warranty",
+  "Código (SKU)": "Code (SKU)",
+  "Avaliações": "Reviews",
+  "✓ Compra verificada": "✓ Verified purchase",
+  "Ainda não há avaliações. Seja o primeiro!": "No reviews yet. Be the first!",
+  "Avaliar este produto": "Rate this product",
+  "Obrigado! Sua avaliação será publicada após aprovação. 💛": "Thanks! Your review will be published after approval. 💛",
+  "Seu nome": "Your name",
+  "Conte o que achou do produto": "Tell us what you think of the product",
+  "Enviar avaliação": "Send review",
+  "Enviando…": "Sending…",
+  "Carregando produto…": "Loading product…",
+  "Escolha as opções": "Choose options",
+  // cart
+  "Meu carrinho": "My cart",
+  "item": "item",
+  "itens": "items",
+  "Entrega em": "Delivery to",
+  "Obrigado, {name}! Recebemos seu pedido.": "Thank you, {name}! We've received your order.",
+  "Este pedido foi {status}.": "This order was {status}.",
+  "Pagar {total}": "Pay {total}",
+  "Preços especiais para lojistas e revendedores. Pedido mínimo de {min}.": "Special prices for retailers and resellers. Minimum order {min}.",
+  "Seu carrinho está vazio": "Your cart is empty",
+  "Que tal dar uma olhada nas nossas ofertas?": "How about a look at our deals?",
+  "Ver produtos": "See products",
+  "Resumo": "Summary",
+  "Subtotal": "Subtotal",
+  "Frete": "Shipping",
+  "calculado no checkout": "calculated at checkout",
+  "Total": "Total",
+  "Finalizar compra": "Checkout",
+  "Continuar comprando": "Continue shopping",
+  "Remover": "Remove",
+  // checkout
+  "1 · Seus dados": "1 · Your details",
+  "Nome completo *": "Full name *",
+  "E-mail": "Email",
+  "CPF / CNPJ": "Tax ID (CPF/CNPJ)",
+  "WhatsApp / telefone *": "WhatsApp / phone *",
+  "2 · Endereço de entrega": "2 · Delivery address",
+  "CEP *": "Postcode (CEP) *",
+  "Rua *": "Street *",
+  "Número": "Number",
+  "Complemento": "Complement",
+  "Bairro": "Neighbourhood",
+  "Cidade *": "City *",
+  "UF *": "State *",
+  "3 · Entrega": "3 · Delivery",
+  "Retirar na loja (Goiânia)": "Store pickup (Goiânia)",
+  "Pronto em 2h": "Ready in 2h",
+  "Grátis": "Free",
+  "4 · Pagamento": "4 · Payment",
+  "10% de desconto · aprovação na hora": "10% off · instant approval",
+  "💳 Cartão de crédito": "💳 Credit card",
+  "em até 12x sem juros": "up to 12x interest-free",
+  "🧾 Boleto bancário": "🧾 Bank slip (Boleto)",
+  "vence em 3 dias úteis": "due in 3 business days",
+  "Resumo do pedido": "Order summary",
+  "Desconto Pix (10%)": "Pix discount (10%)",
+  "Li e aceito os": "I have read and accept the",
+  "e a": "and the",
+  "Termos": "Terms",
+  "Política de Privacidade": "Privacy Policy",
+  "Preencha os campos obrigatórios e aceite os termos.": "Fill in the required fields and accept the terms.",
+  "Não foi possível finalizar o pedido.": "We couldn't complete your order.",
+  "Processando…": "Processing…",
+  "🔒 Ambiente seguro · seus dados protegidos": "🔒 Secure · your data is protected",
+  "Carrinho vazio": "Empty cart",
+  "5 a 9 dias úteis": "5 to 9 business days",
+  "2 a 4 dias úteis": "2 to 4 business days",
+  // confirmation
+  "Pedido confirmado!": "Order confirmed!",
+  "💠 Pague com Pix para liberar seu pedido": "💠 Pay with Pix to release your order",
+  "Escaneie o QR Code no app do seu banco. (No site real, o Pix é gerado pelo Mercado Pago.)": "Scan the QR code in your bank app. (On the live site, Pix is generated by Mercado Pago.)",
+  "🧾 Seu boleto foi gerado e enviado por e-mail. Vence em 3 dias úteis.": "🧾 Your bank slip was generated and emailed. Due in 3 business days.",
+  "Itens": "Items",
+  "Desconto": "Discount",
+  "Entrega": "Delivery",
+  "Previsão: 5 a 9 dias úteis após a confirmação do pagamento.": "Estimate: 5 to 9 business days after payment confirmation.",
+  "Acompanhar pedido": "Track order",
+  "💬 Falar no WhatsApp": "💬 Chat on WhatsApp",
+  "Pedido não encontrado": "Order not found",
+  "Voltar à loja": "Back to store",
+  "Carregando pedido…": "Loading order…",
+  // track
+  "Nº do pedido (MDB-2026-0001)": "Order no. (MDB-2026-0001)",
+  "E-mail ou telefone": "Email or phone",
+  "Código de rastreio:": "Tracking code:",
+  "Pedido recebido": "Order received",
+  "Aguardando pagamento": "Awaiting payment",
+  "Pagamento confirmado": "Payment confirmed",
+  "Em separação": "Being prepared",
+  "Embalado": "Packed",
+  "Enviado": "Shipped",
+  "Saiu para entrega": "Out for delivery",
+  "Entregue": "Delivered",
+  "Cancelado": "Cancelled",
+  "Reembolsado": "Refunded",
+  // atacado
+  "📦 Atacado": "📦 Wholesale",
+  "Compre no atacado e revenda com lucro": "Buy wholesale and resell for profit",
+  "Preços de atacado": "Wholesale prices",
+  "Margens que cabem na sua revenda.": "Margins that fit your resale.",
+  "Caixas fechadas": "Full cases",
+  "Compre por embalagem com preço reduzido.": "Buy by the pack at reduced prices.",
+  "Entrega nacional": "Nationwide delivery",
+  "Enviamos para todo o Brasil.": "We ship across Brazil.",
+  "Pix e boleto": "Pix & bank slip",
+  "Condições facilitadas para lojistas.": "Easy terms for retailers.",
+  "Como funciona": "How it works",
+  "Cadastre-se": "Register",
+  "Preencha o formulário com os dados da sua empresa.": "Fill in the form with your business details.",
+  "Aprovação": "Approval",
+  "Analisamos e liberamos seu acesso atacado.": "We review and unlock your wholesale access.",
+  "Compre com preço de atacado": "Shop at wholesale prices",
+  "Preços e mínimos especiais aparecem para você.": "Special prices and minimums appear for you.",
+  "Cadastro enviado!": "Registration sent!",
+  "Falar com o atacado": "Chat with wholesale",
+  "Nome da empresa *": "Company name *",
+  "WhatsApp *": "WhatsApp *",
+  "CPF / CNPJ *": "Tax ID (CPF/CNPJ) *",
+  "Inscrição estadual": "State registration",
+  "Endereço da empresa": "Company address",
+  "Estado *": "State *",
+  "Instagram / site": "Instagram / website",
+  "Tipo de negócio": "Business type",
+  "Selecione…": "Select…",
+  "Loja física": "Physical store",
+  "Loja online": "Online store",
+  "Revenda / sacoleira": "Reseller",
+  "Distribuidora": "Distributor",
+  "Outro": "Other",
+  "Volume de compra esperado": "Expected purchase volume",
+  "Enviar cadastro": "Submit registration",
+  // static / about / contact / faq
+  "Sobre nós": "About us",
+  "Fale conosco": "Contact us",
+  "Perguntas frequentes": "FAQ",
+  "Entrega e frete": "Shipping & delivery",
+  "Trocas e devoluções": "Exchanges & returns",
+  "Privacidade (LGPD)": "Privacy (LGPD)",
+  "Termos de uso": "Terms of use",
+  "Atendimento": "Customer service",
+  "Institucional": "Company",
+  "Siga & pague": "Follow & pay",
+  "Compra 100% segura": "100% secure checkout",
+  "Ver no mapa →": "View on map →",
+  "Ver no Google Maps →": "View on Google Maps →",
+  "Chamar no WhatsApp": "Chat on WhatsApp",
+  "💬 Chamar no WhatsApp": "💬 Chat on WhatsApp",
+  "Nome": "Name",
+  "Assunto": "Subject",
+  "Nº do pedido (se houver)": "Order no. (if any)",
+  "Sua mensagem": "Your message",
+  "Enviar mensagem": "Send message",
+  "Mensagem enviada! Responderemos em breve. 💛": "Message sent! We'll reply soon. 💛",
+  "Entrar": "Sign in",
+  "Senha": "Password",
+  "Rastrear um pedido sem login": "Track an order without signing in",
+  "Página não encontrada": "Page not found",
+  "Meus favoritos": "My favorites",
+  "Sua lista de favoritos está vazia": "Your favorites list is empty",
+  "Toque no coração dos produtos que você ama para salvá-los aqui.": "Tap the heart on the products you love to save them here.",
+  "Explorar produtos": "Explore products",
+  "Sobre a Mundo dos Brinquedos": "About Mundo dos Brinquedos",
+  "Entre para ver seus pedidos, favoritos e endereços — ou continue como visitante.": "Sign in to see your orders, favorites and addresses — or continue as a guest.",
+  "O login de clientes será ativado na Fase 2. No protótipo, os pedidos ficam visíveis no painel do admin.": "Customer login will be enabled in Phase 2. In the prototype, orders are visible in the admin panel.",
+  "Sua conta ficará pendente até a aprovação da nossa equipe. Você receberá um retorno em breve.": "Your account will stay pending until our team approves it. You'll hear back soon.",
+  // spec values (material / age / warranty)
+  "3 meses contra defeitos de fabricação": "3 months against manufacturing defects",
+  "Vinil e algodão": "Vinyl and cotton",
+  "Plástico ABS": "ABS plastic",
+  "Plástico e borracha": "Plastic and rubber",
+  "Plástico": "Plastic",
+  "Plástico reforçado": "Reinforced plastic",
+  "Aço carbono": "Carbon steel",
+  "Alumínio e PU": "Aluminium and PU",
+  "Plástico atóxico": "Non-toxic plastic",
+  "Papelão premium": "Premium cardboard",
+  "Tecido e plástico": "Fabric and plastic",
+  "Silicone atóxico": "Non-toxic silicone",
+  "Não tóxico": "Non-toxic",
+  "Aço inox": "Stainless steel",
+  "Pelúcia antialérgica": "Hypoallergenic plush",
+  "Variados": "Assorted",
+  "Aço e plástico": "Steel and plastic",
+  "5-8 anos": "5-8 years",
+  "1-3 anos": "1-3 years",
+  "1-4 anos": "1-4 years",
+  "Todas": "All ages",
+  // variants
+  "cor": "colour",
+  "tamanho": "size",
+  "Rosa": "Pink",
+  "Azul": "Blue",
+  "Verde": "Green",
+  "Amarelo": "Yellow",
+  "Preto": "Black",
+  "Lilás": "Lilac",
+  "Vermelho": "Red",
+  "Pele clara": "Light skin",
+  "Pele morena": "Tan skin",
+  "Sortido": "Assorted",
+  // product page extra
+  "💠 {v} no Pix ({pct}% de desconto)": "💠 {v} via Pix ({pct}% off)",
+  "📦 Atacado: {v}": "📦 Wholesale: {v}",
+  "(mín. {n} un.)": "(min. {n} units)",
+};
+
+type I18nCtx = {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: (s: string, params?: Record<string, string | number>) => string;
+  tf: <T extends Record<string, unknown>>(obj: T | null | undefined, base: string) => string;
+};
+const Ctx = createContext<I18nCtx | null>(null);
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(() => (localStorage.getItem("mundo_lang") as Lang) || "pt");
+
+  useEffect(() => {
+    localStorage.setItem("mundo_lang", lang);
+    document.documentElement.lang = lang === "en" ? "en" : "pt-BR";
+  }, [lang]);
+
+  const value = useMemo<I18nCtx>(() => {
+    const t = (s: string, params?: Record<string, string | number>) => {
+      let out = lang === "en" ? EN[s] ?? s : s;
+      if (params) for (const [k, v] of Object.entries(params)) out = out.replace(`{${k}}`, String(v));
+      return out;
+    };
+    // pick localized DB field: tf(product, "name") → product.nameEn (en) or product.name
+    const tf = <T extends Record<string, unknown>>(obj: T | null | undefined, base: string) => {
+      if (!obj) return "";
+      if (lang === "en") {
+        const en = obj[`${base}En`];
+        if (typeof en === "string" && en.trim()) return en;
+      }
+      return String(obj[base] ?? "");
+    };
+    return { lang, setLang: setLangState, t, tf };
+  }, [lang]);
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useI18n() {
+  const c = useContext(Ctx);
+  if (!c) throw new Error("useI18n must be used within I18nProvider");
+  return c;
+}
+
+// plural helper: qtyLabel(3, "produto", "produtos") — EN uses the count too
+// eslint-disable-next-line react-refresh/only-export-components
+export function plural(n: number, one: string, many: string) {
+  return `${n} ${n === 1 ? one : many}`;
+}
