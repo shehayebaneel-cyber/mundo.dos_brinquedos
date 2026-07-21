@@ -245,6 +245,7 @@ const EN: Record<string, string> = {
   "Siga & pague": "Follow & pay",
   "Compra 100% segura": "100% secure checkout",
   "Ver no mapa →": "View on map →",
+  "Seg a Sáb, 08:00–18:00": "Mon–Sat, 08:00–18:00",
   "Ver no Google Maps →": "View on Google Maps →",
   "Chamar no WhatsApp": "Chat on WhatsApp",
   "💬 Chamar no WhatsApp": "💬 Chat on WhatsApp",

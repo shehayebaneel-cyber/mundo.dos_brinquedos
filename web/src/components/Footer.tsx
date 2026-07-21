@@ -12,7 +12,7 @@ export function Footer() {
           <div className="font-display text-lg font-extrabold text-white">{settings.storeName ?? "Mundo dos Brinquedos"}</div>
           <p className="mt-2 leading-relaxed">{tf(settings, "tagline")}</p>
           <p className="mt-3">📍 {settings.address}</p>
-          <p>🕗 {settings.hours}</p>
+          <p>🕗 {t(settings.hours ?? "")}</p>
           <a href={settings.mapsUrl} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sun">{t("Ver no mapa →")}</a>
         </div>
         <div>

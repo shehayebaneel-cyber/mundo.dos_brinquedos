@@ -30,7 +30,7 @@ export function Sobre() {
       </div>
       <div className="mt-6 rounded-[16px] border border-line bg-surface p-5 text-sm">
         <p>📍 {settings.address}</p>
-        <p>🕗 {settings.hours}</p>
+        <p>🕗 {t(settings.hours ?? "")}</p>
         <p>💬 {settings.whatsappLabel}</p>
       </div>
     </div>
@@ -52,7 +52,7 @@ export function Contato() {
             <p>📞 {settings.whatsappLabel}</p>
             <p>✉️ {settings.email}</p>
             <p>📍 {settings.address}</p>
-            <p>🕗 {settings.hours}</p>
+            <p>🕗 {t(settings.hours ?? "")}</p>
             <a href={settings.mapsUrl} target="_blank" rel="noreferrer" className="text-brand-dark underline">{t("Ver no Google Maps →")}</a>
           </div>
           <a href={settings.instagram} target="_blank" rel="noreferrer" className="btn w-full bg-gradient-to-r from-[#feda75] via-[#d62976] to-[#4f5bd5] py-2.5 text-white">📸 {settings.instagramHandle}</a>
