@@ -77,6 +77,13 @@ wholesale access.
 - ✅ Sitemap + concept + design directions delivered; Direction B chosen.
 - ✅ web/ + design system locked & verified.
 - ✅ Bilingual PT/EN storefront (toggle, translated UI + product/category/banner content).
+- ✅ **Production wiring:** Neon Postgres (schema pushed + seeded); single Render web
+  service (Express serves API + built web/dist) via render.yaml blueprint. Secrets in
+  git-ignored server/.env + Render env vars (DATABASE_URL, DIRECT_URL, ADMIN_KEY).
+  Migrate to Hetzner later = same Postgres + same server (point DATABASE_URL at new DB).
+- ⏭ First Render deploy is a manual Blueprint import by the owner (see below); then
+  auto-deploys on push. Rotate the Neon password after setup (it was shared in chat).
+- ⏭ Mercado Pago payments (Pix/card/webhook) before real selling.
 - ✅ **Full working prototype (this milestone):** server + Prisma model + rich seed
   (20 products, variants, 6 customers, 8 orders, 12 reviews, banners, settings) +
   public & admin API; storefront (home/shop/product/cart/checkout/confirmation/track/
