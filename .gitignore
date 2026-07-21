@@ -3,6 +3,9 @@ node_modules/
 # builds
 dist/
 build/
+# local sqlite (prototype only — prod uses Neon Postgres)
+*.db
+*.db-journal
 # env / secrets
 .env
 .env.*

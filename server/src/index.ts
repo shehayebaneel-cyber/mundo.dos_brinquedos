@@ -1,5 +1,8 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import { PrismaClient } from "@prisma/client";
 
 const db = new PrismaClient();
@@ -358,5 +361,14 @@ app.put("/api/admin/settings", asyncH(async (req, res) => {
   for (const [key, value] of Object.entries(b)) await db.setting.upsert({ where: { key }, create: { key, value: String(value) }, update: { value: String(value) } });
   res.json({ ok: true });
 }));
+
+// In production, serve the built web app from this same service (API + site).
+// Locally we use the Vite dev server (5310), so this only kicks in if the build exists.
+const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/dist");
+if (fs.existsSync(webDist)) {
+  app.use(express.static(webDist));
+  // SPA fallback for any non-API route
+  app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(webDist, "index.html")));
+}
 
 app.listen(PORT, () => console.log(`🧸 Mundo API on http://localhost:${PORT}`));
