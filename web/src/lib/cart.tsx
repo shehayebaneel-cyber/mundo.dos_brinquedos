@@ -1,6 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useStore } from "./store";
 import { priceCart, type Priced, type Tier } from "./pricing";
+import { api } from "./api";
+import type { Product } from "./types";
 
 export type CartLine = {
   productId: number;
@@ -67,6 +69,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem(KEY, JSON.stringify(lines));
   }, [lines]);
+
+  // Re-price each line from LIVE product data so the cart always reflects the
+  // current regular + tier prices (prices are never trusted from the snapshot).
+  const refreshed = useRef(new Set<string>());
+  const idKey = lines.map((l) => l.slug).join(",");
+  useEffect(() => {
+    const todo = lines.filter((l) => !refreshed.current.has(l.slug));
+    if (!todo.length) return;
+    todo.forEach((l) => refreshed.current.add(l.slug));
+    Promise.all(
+      todo.map((l) => api.get<{ product: Product }>(`/api/products/${l.slug}`).then((r) => r.product).catch(() => null)),
+    ).then((prods) => {
+      const bySlug = new Map(prods.filter(Boolean).map((p) => [p!.slug, p!]));
+      setLines((cur) =>
+        cur.map((l) => {
+          const p = bySlug.get(l.slug);
+          return p ? { ...l, regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents, stock: p.stock } : l;
+        }),
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idKey]);
 
   const key = (id: number, variant: string) => `${id}::${variant}`;
 
