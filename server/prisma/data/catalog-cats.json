@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "carros-de-ferro",
+    "name": "Carros de Ferro",
+    "emoji": "🚗",
+    "accent": "sky",
+    "blurb": "Carrinhos, caminhões e motos de ferro e fricção."
+  },
+  {
+    "slug": "atacado",
+    "name": "Brinquedos no Atacado",
+    "emoji": "📦",
+    "accent": "grape",
+    "blurb": "Variedade enorme de brinquedos com preço de atacado."
+  },
+  {
+    "slug": "educativos",
+    "name": "Brinquedos Educativos e Quebra-Cabeças",
+    "emoji": "🧩",
+    "accent": "mint",
+    "blurb": "Quebra-cabeças, letras, números e brinquedos de montar."
+  },
+  {
+    "slug": "garrafas-copos",
+    "name": "Garrafas e Copos",
+    "emoji": "🥤",
+    "accent": "teal",
+    "blurb": "Garrafas térmicas, infantis e copos de todos os tamanhos."
+  },
+  {
+    "slug": "brinquedos-1-a-6",
+    "name": "Brinquedos de R$1 a R$6",
+    "emoji": "🎉",
+    "accent": "brand",
+    "blurb": "Diversão que cabe no bolso — tudo de R$1 a R$6."
+  }
+]

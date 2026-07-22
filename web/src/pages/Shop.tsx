@@ -126,10 +126,24 @@ export function Shop({ mode }: { mode?: "ofertas" | "search" | "all" }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-5">
-      <header className="mb-4">
-        <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">{title}</h1>
-        {cat?.blurb && <p className="mt-1 text-muted">{tf(cat, "blurb")}</p>}
-      </header>
+      {cat ? (
+        <div className="relative mb-5 overflow-hidden rounded-[26px] p-5 text-white sm:p-7" style={{ background: `var(--color-${cat.accent})` }}>
+          <span className="dots pointer-events-none absolute inset-0 text-white/15" aria-hidden />
+          <div className="relative flex items-center gap-4">
+            <span className="grid h-16 w-16 shrink-0 place-items-center rounded-[22px] bg-white/20 text-4xl sm:h-20 sm:w-20 sm:text-5xl">{cat.emoji}</span>
+            <div>
+              <h1 className="font-display text-2xl font-extrabold sm:text-3xl">{tf(cat, "name")}</h1>
+              <p className="mt-0.5 text-sm text-white/90">
+                <b>{items ? filtered.length : "…"}</b> {t("produtos")}{cat.blurb ? ` · ${tf(cat, "blurb")}` : ""}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <header className="mb-4">
+          <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">{title}</h1>
+        </header>
+      )}
 
       {/* toolbar */}
       <div className="mb-4 flex items-center gap-2">
@@ -248,8 +262,8 @@ function FilterPanel({
         </div>
       </Group>
 
-      {facets.brands.length > 0 && (
-        <Group title={t("Marca")}>
+      <Group title={t("Marca")}>
+        {facets.brands.length ? (
           <div className="space-y-1">
             {facets.brands.map((b) => (
               <label key={b} className="flex cursor-pointer items-center gap-2 py-0.5">
@@ -257,23 +271,21 @@ function FilterPanel({
               </label>
             ))}
           </div>
-        </Group>
-      )}
+        ) : <Soon t={t} />}
+      </Group>
 
-      {facets.ages.length > 0 && (
-        <Group title={t("Idade")}>
+      <Group title={t("Idade")}>
+        {facets.ages.length ? (
           <div className="flex flex-wrap gap-2">
             {facets.ages.map((a) => (
-              <button key={a} onClick={() => upd({ ages: toggleIn(f.ages, a) })} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${f.ages.includes(a) ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink"}`}>
-                {t(a)}
-              </button>
+              <button key={a} onClick={() => upd({ ages: toggleIn(f.ages, a) })} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${f.ages.includes(a) ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink"}`}>{t(a)}</button>
             ))}
           </div>
-        </Group>
-      )}
+        ) : <Soon t={t} />}
+      </Group>
 
-      {facets.colours.length > 0 && (
-        <Group title={t("Cor")}>
+      <Group title={t("Cor")}>
+        {facets.colours.length ? (
           <div className="flex flex-wrap gap-2">
             {facets.colours.map(([label, swatch]) => {
               const on = f.colours.includes(label);
@@ -284,22 +296,26 @@ function FilterPanel({
               );
             })}
           </div>
-        </Group>
-      )}
+        ) : <Soon t={t} />}
+      </Group>
 
-      {facets.sizes.length > 0 && (
-        <Group title={t("Tamanho")}>
+      <Group title={t("Tamanho / capacidade")}>
+        {facets.sizes.length ? (
           <div className="flex flex-wrap gap-2">
             {facets.sizes.map((s) => (
-              <button key={s} onClick={() => upd({ sizes: toggleIn(f.sizes, s) })} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${f.sizes.includes(s) ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink"}`}>
-                {t(s)}
-              </button>
+              <button key={s} onClick={() => upd({ sizes: toggleIn(f.sizes, s) })} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${f.sizes.includes(s) ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink"}`}>{t(s)}</button>
             ))}
           </div>
-        </Group>
-      )}
+        ) : <Soon t={t} />}
+      </Group>
+
+      <Group title={t("Material")}><Soon t={t} /></Group>
     </div>
   );
+}
+
+function Soon({ t }: { t: (s: string) => string }) {
+  return <p className="text-xs text-muted">{t("Em breve — em atualização.")}</p>;
 }
 
 function Group({ title, children }: { title: string; children: React.ReactNode }) {

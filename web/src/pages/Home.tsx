@@ -43,7 +43,7 @@ export function Home() {
               O mundo da diversão começa <span className="text-yellow">aqui!</span>
             </h1>
             <p className="mt-2.5 max-w-md text-sm text-white/90 sm:text-base">
-              Brinquedos e variedades com preços de <b>R$2 a R$6</b> — atacado e varejo, entrega para todo o Brasil. 🚚
+              Carros de ferro, educativos, garrafas e muito mais — <b>varejo e atacado</b>, entrega para todo o Brasil. 🚚
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link to="/produtos" className="btn bg-white px-5 py-2.5 text-blue-dark hover:bg-white/90">🛍️ {t("Ver produtos")}</Link>

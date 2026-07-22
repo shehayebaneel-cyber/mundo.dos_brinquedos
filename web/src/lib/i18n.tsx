@@ -89,6 +89,8 @@ const EN: Record<string, string> = {
   "Idade": "Age",
   "Cor": "Colour",
   "Tamanho": "Size",
+  "Tamanho / capacidade": "Size / capacity",
+  "Em breve — em atualização.": "Coming soon — being updated.",
   "Avaliação": "Rating",
   "Estoque baixo": "Low stock",
   "Promoção": "On sale",
