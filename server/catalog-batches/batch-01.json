@@ -1,0 +1,23 @@
+{ "rows": [
+  { "name": "Garrafa Térmica 1L Temperatura", "note": "Marca Temperatura", "cat": "Garrafas" },
+  { "name": "Garrafa Térmica com Copo", "cat": "Garrafas" },
+  { "name": "Garrafa Térmica com Canudo", "cat": "Garrafas" },
+  { "name": "Copo", "note": "Copo whiskey", "cat": "Copos" },
+  { "name": "Copo por Café ou Leite", "cat": "Copos" },
+  { "name": "Caneca P", "note": "Caneca Pequena", "cat": "Copos" },
+  { "name": "Copo 1200ml", "note": "Com Tampa Diferente", "cat": "Copos" },
+  { "name": "Carregador com Cabo C Inova", "cat": "Eletrónicos" },
+  { "name": "Carregador com Cabo 4.1A", "cat": "Eletrónicos" },
+  { "name": "Carregador Turbo 3.1A", "cat": "Eletrónicos" },
+  { "name": "Carregador Turbo 30+", "cat": "Eletrónicos" },
+  { "name": "Caixa de Som Mini", "cat": "Eletrónicos" },
+  { "name": "Caixa de Som com Carregador Inova", "note": "Caixa de Som Inova G com Carregador", "cat": "Eletrónicos" },
+  { "name": "Maquina de Cortar Cabelo Dragão", "cat": "Eletrónicos" },
+  { "name": "Bolha de Sabão Astronauta", "price": 2.50, "cat": "Brinquedos" },
+  { "name": "Cartela de Carinhos", "note": "4 Peças", "price": 10.00, "cat": "Carrinhos" },
+  { "name": "Carro Flexão", "price": 10.00, "cat": "Carrinhos" },
+  { "name": "Barco Transformer de Polícia", "note": "Abre e Fecha Robô Com Pilha", "price": 28.00, "cat": "Brinquedos" },
+  { "name": "Boneca MOANA", "note": "MOANA", "price": 10.00, "cat": "Bonecas" },
+  { "name": "Robô", "note": "Anda e faz Barulho Com Pilha", "price": 35.00, "old": 45.00, "cat": "Brinquedos" },
+  { "name": "Miçanga", "price": 15.00, "cat": "Papelaria e Criativos" }
+] }
