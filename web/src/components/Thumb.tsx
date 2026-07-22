@@ -6,15 +6,17 @@ export function Thumb({
   alt,
   className = "",
   emojiSize = "text-5xl",
+  fit = "cover",
 }: {
   url?: string;
   alt?: string;
   className?: string;
   emojiSize?: string;
+  fit?: "cover" | "contain";
 }) {
   const img = parseImg(url);
   if ("url" in img) {
-    return <img src={img.url} alt={alt ?? ""} loading="lazy" className={`h-full w-full object-cover ${className}`} />;
+    return <img src={img.url} alt={alt ?? ""} loading="lazy" className={`h-full w-full ${fit === "contain" ? "object-contain" : "object-cover"} ${className}`} />;
   }
   return (
     <div

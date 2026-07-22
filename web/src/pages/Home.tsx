@@ -65,11 +65,17 @@ export function Home() {
       {/* CATEGORIES */}
       <section>
         <SectionHead title={t("Categorias")} to="/produtos" />
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
           {categories.map((c) => (
-            <Link key={c.id} to={`/categoria/${c.slug}`} className="flex flex-col items-center gap-1.5 rounded-[16px] border border-line bg-surface p-3 text-center transition-transform hover:-translate-y-0.5">
-              <span className="grid h-12 w-12 place-items-center rounded-full text-2xl" style={{ background: `color-mix(in srgb, var(--color-${c.accent}) 16%, white)` }}>{c.emoji}</span>
-              <span className="text-[11px] font-bold leading-tight text-ink">{tf(c, "name")}</span>
+            <Link
+              key={c.id}
+              to={`/categoria/${c.slug}`}
+              className="group flex flex-col items-center gap-2 rounded-2xl border border-line bg-surface p-3 text-center transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-[var(--shadow-card)]"
+            >
+              <span className="grid h-14 w-14 place-items-center rounded-full text-2xl transition-transform group-hover:scale-110" style={{ background: `color-mix(in srgb, var(--color-${c.accent}) 16%, white)` }}>
+                {c.emoji}
+              </span>
+              <span className="line-clamp-2 min-h-[2.4em] text-[11px] font-bold leading-tight text-ink sm:text-xs">{tf(c, "name")}</span>
             </Link>
           ))}
         </div>
@@ -103,17 +109,6 @@ export function Home() {
           <section><SectionHead title={t("Em destaque")} emoji="⭐" to="/produtos?flag=destaque" /><ProductRow items={s.destaque} /></section>
         </>
       )}
-
-      {/* INSTAGRAM */}
-      <section>
-        <SectionHead title={settings.instagramHandle ?? "@mundo.dos_brinquedos"} emoji="📸" />
-        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-          {["🧸", "🎈", "🚲", "🎁", "🪀", "👶"].map((e, i) => (
-            <div key={i} className="grid aspect-square place-items-center rounded-xl bg-gradient-to-br from-[#feda75] via-[#d62976] to-[#962fbf] text-3xl">{e}</div>
-          ))}
-        </div>
-        <a href={settings.instagram} target="_blank" rel="noreferrer" className="btn mt-3 w-full bg-gradient-to-r from-[#feda75] via-[#d62976] to-[#4f5bd5] py-3 text-white">{t("Siga-nos no Instagram")}</a>
-      </section>
 
       {/* NEWSLETTER */}
       <section className="rounded-[16px] border border-dashed border-brand bg-surface p-6 text-center">

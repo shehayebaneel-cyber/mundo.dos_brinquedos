@@ -73,7 +73,17 @@ app.get("/api/products", asyncH(async (req, res) => {
       { description: { contains: term } },
     ];
   }
-  let items = await db.product.findMany({ where, include: withMedia });
+  const raw = await db.product.findMany({
+    where,
+    include: { ...withMedia, reviews: { where: { approved: true }, select: { rating: true } } },
+  });
+  // Attach avgRating + reviewCount, drop raw reviews from the list payload.
+  let items = raw.map((p) => {
+    const rs = p.reviews;
+    const avgRating = rs.length ? rs.reduce((s, r) => s + r.rating, 0) / rs.length : 0;
+    const { reviews: _reviews, ...rest } = p;
+    return { ...rest, avgRating, reviewCount: rs.length };
+  });
   if (flag === "ofertas") items = items.filter((p) => p.oldPriceCents && p.oldPriceCents > p.priceCents);
 
   const discount = (p: (typeof items)[number]) =>
@@ -85,6 +95,7 @@ app.get("/api/products", asyncH(async (req, res) => {
     if (s === "novidades") return +b.isNew - +a.isNew || b.createdAt.getTime() - a.createdAt.getTime();
     if (s === "mais-vendidos") return +b.bestSeller - +a.bestSeller || b.priceCents - a.priceCents;
     if (s === "maiores-descontos") return discount(b) - discount(a);
+    if (s === "melhor-avaliados") return b.avgRating - a.avgRating || b.reviewCount - a.reviewCount;
     // relevancia
     return +b.featured - +a.featured || +b.bestSeller - +a.bestSeller || b.createdAt.getTime() - a.createdAt.getTime();
   });

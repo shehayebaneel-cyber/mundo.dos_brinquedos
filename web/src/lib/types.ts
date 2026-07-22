@@ -16,7 +16,9 @@ export type Product = {
   pixPercent: number; stock: number; lowStockAt: number; minWholesaleQty: number; packQty: number;
   installmentsMax: number; ageGroup: string; material: string; weightGrams: number; warranty: string;
   featured: boolean; isNew: boolean; bestSeller: boolean; wholesaleOnly: boolean; active: boolean;
-  images: ProductImage[]; variants: Variant[]; reviews?: Review[]; createdAt: string; updatedAt: string;
+  images: ProductImage[]; variants: Variant[]; reviews?: Review[];
+  avgRating?: number; reviewCount?: number;
+  createdAt: string; updatedAt: string;
 };
 export type Banner = {
   id: number; title: string; titleEn?: string; subtitle: string; subtitleEn?: string;
