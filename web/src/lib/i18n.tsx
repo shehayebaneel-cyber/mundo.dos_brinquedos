@@ -12,6 +12,7 @@ const EN: Record<string, string> = {
   "Atacado": "Wholesale",
   "Categorias": "Categories",
   "Todos os produtos": "All products",
+  "Todos": "All",
   "Minha conta": "My account",
   "Rastrear pedido": "Track order",
   "Início": "Home",

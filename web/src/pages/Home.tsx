@@ -38,35 +38,35 @@ export function Home() {
         <Star className="absolute right-[42%] top-6 h-5 w-5 text-white/70" />
         <Squiggle className="absolute left-[30%] bottom-24 h-6 w-28 text-white/40" />
         <BlobFace className="absolute -left-8 bottom-[-10px] h-28 w-28 text-teal opacity-90" />
-        <div className="mx-auto grid max-w-6xl items-center gap-6 px-4 py-10 sm:py-14 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-6 px-4 py-6 sm:py-8 lg:grid-cols-2">
           <div className="relative z-10">
             <span className="inline-flex items-center gap-2 rounded-full bg-yellow px-3 py-1 text-xs font-extrabold text-ink">🎉 {settings.tagline || "Varejo e atacado · entrega para todo o Brasil"}</span>
-            <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] sm:text-6xl">
-              O mundo da<br />diversão começa <span className="text-yellow">aqui!</span>
+            <h1 className="mt-3 font-display text-3xl font-extrabold leading-[1.05] sm:text-5xl">
+              O mundo da diversão começa <span className="text-yellow">aqui!</span>
             </h1>
-            <p className="mt-3 max-w-md text-white/90 sm:text-lg">
+            <p className="mt-2.5 max-w-md text-sm text-white/90 sm:text-base">
               Brinquedos e variedades com preços de <b>R$2 a R$6</b> — atacado e varejo, entrega para todo o Brasil. 🚚
             </p>
-            <div className="mt-6 flex flex-wrap gap-2.5">
-              <Link to="/produtos" className="btn bg-white px-6 py-3 text-base text-blue-dark hover:bg-white/90">🛍️ {t("Ver produtos")}</Link>
-              <Link to="/ofertas" className="btn bg-brand px-6 py-3 text-base text-white hover:bg-brand-dark">🏷️ {t("Ofertas")}</Link>
-              <Link to="/atacado" className="btn border-2 border-white/70 px-6 py-3 text-base text-white hover:bg-white/10">📦 {t("Atacado")}</Link>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link to="/produtos" className="btn bg-white px-5 py-2.5 text-blue-dark hover:bg-white/90">🛍️ {t("Ver produtos")}</Link>
+              <Link to="/ofertas" className="btn bg-brand px-5 py-2.5 text-white hover:bg-brand-dark">🏷️ {t("Ofertas")}</Link>
+              <Link to="/atacado" className="btn border-2 border-white/70 px-5 py-2.5 text-white hover:bg-white/10">📦 {t("Atacado")}</Link>
             </div>
           </div>
           {/* floating real product tiles */}
-          <div className="relative z-10 hidden grid-cols-2 gap-4 lg:grid">
-            {heroPics.map((p, i) => (
-              <Link key={p.id} to={`/produto/${p.slug}`} className={`overflow-hidden rounded-3xl bg-white p-2 shadow-play ${i % 2 ? "translate-y-6" : ""}`}>
-                <img src={p.images[0]?.url} alt={p.name} className="aspect-square w-full rounded-2xl object-contain" />
-                <div className="px-2 py-1.5">
-                  <div className="truncate text-sm font-bold text-ink">{p.name}</div>
-                  <div className="font-display text-lg font-extrabold text-brand">{brl(p.priceCents)}</div>
+          <div className="relative z-10 ml-auto hidden max-w-[420px] grid-cols-2 gap-2.5 lg:grid">
+            {heroPics.slice(0, 4).map((p, i) => (
+              <Link key={p.id} to={`/produto/${p.slug}`} className={`overflow-hidden rounded-2xl bg-white p-1.5 shadow-play ${i % 2 ? "translate-y-3" : ""}`}>
+                <img src={p.images[0]?.url} alt={p.name} className="aspect-[5/4] w-full rounded-xl object-contain" />
+                <div className="px-1.5 py-1">
+                  <div className="truncate text-xs font-bold text-ink">{p.name}</div>
+                  <div className="font-display text-sm font-extrabold text-brand">{brl(p.priceCents)}</div>
                 </div>
               </Link>
             ))}
           </div>
         </div>
-        <Wave className="block h-8 w-full text-cream sm:h-12" />
+        <Wave className="block h-6 w-full text-cream sm:h-9" />
       </section>
 
       <div className="mx-auto max-w-6xl space-y-12 px-4">

@@ -50,16 +50,14 @@ export function Header() {
         </nav>
       </div>
 
-      {/* colourful category strip (desktop) */}
+      {/* main options strip (desktop) — categories live in the dropdown + home section */}
       <div className="hidden border-t-2 border-line bg-surface md:block">
-        <div className="no-scrollbar mx-auto flex max-w-6xl items-center gap-2 overflow-x-auto px-4 py-2">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2">
+          <CategoriesMenu categories={categories} tf={tf} t={t} />
           <CatPill to="/produtos" emoji="🛍️" label={t("Todos os produtos")} accent="ink" />
-          {categories.map((c) => (
-            <CatPill key={c.id} to={`/categoria/${c.slug}`} emoji={c.emoji} label={tf(c, "name")} accent={c.accent} />
-          ))}
-          <span className="mx-1 h-6 w-px shrink-0 bg-line" />
           <CatPill to="/ofertas" emoji="🏷️" label={t("Ofertas")} accent="brand" solid />
           <CatPill to="/atacado" emoji="📦" label={t("Atacado")} accent="grape" solid />
+          <CatPill to="/rastrear" emoji="🚚" label={t("Rastrear pedido")} accent="sky" />
         </div>
       </div>
 
@@ -69,12 +67,12 @@ export function Header() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("Buscar brinquedos, bonecas…")} className="w-full bg-transparent text-sm outline-none placeholder:text-muted" />
       </form>
 
-      {/* mobile category strip */}
+      {/* mobile main options strip — full category list is in the ☰ drawer + home section */}
       <div className="no-scrollbar flex items-center gap-2 overflow-x-auto border-t-2 border-line bg-surface px-3 py-2 md:hidden">
-        {categories.map((c) => (
-          <CatPill key={c.id} to={`/categoria/${c.slug}`} emoji={c.emoji} label={tf(c, "name")} accent={c.accent} />
-        ))}
+        <CatPill to="/produtos" emoji="🛍️" label={t("Todos")} accent="ink" />
         <CatPill to="/ofertas" emoji="🏷️" label={t("Ofertas")} accent="brand" solid />
+        <CatPill to="/atacado" emoji="📦" label={t("Atacado")} accent="grape" solid />
+        <CatPill to="/rastrear" emoji="🚚" label={t("Rastrear pedido")} accent="sky" />
       </div>
 
       {/* mobile drawer */}
@@ -104,6 +102,28 @@ export function Header() {
         </div>
       )}
     </header>
+  );
+}
+
+function CategoriesMenu({ categories, tf, t }: { categories: { id: number; slug: string; emoji: string; accent: string; name: string }[]; tf: (o: never, b: string) => string; t: (s: string) => string }) {
+  return (
+    <div className="group relative">
+      <button className="flex shrink-0 items-center gap-1.5 rounded-full border-2 border-line bg-surface-2 px-3.5 py-1.5 text-[13px] font-extrabold text-ink group-hover:border-brand/40">
+        🗂️ {t("Categorias")}
+        <span className="text-[10px] transition-transform group-hover:rotate-180">▾</span>
+      </button>
+      <div className="invisible absolute left-0 top-full z-40 w-[520px] translate-y-1 rounded-2xl border-2 border-line bg-surface p-3 opacity-0 shadow-[var(--shadow-pop)] transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="grid grid-cols-2 gap-1">
+          {categories.map((c) => (
+            <Link key={c.id} to={`/categoria/${c.slug}`} className="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-surface-2">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-xl text-white" style={{ background: `var(--color-${c.accent})` }}>{c.emoji}</span>
+              <span className="text-sm font-bold leading-tight text-ink">{tf(c as never, "name")}</span>
+            </Link>
+          ))}
+        </div>
+        <Link to="/produtos" className="mt-1 block rounded-xl px-3 py-2 text-center text-sm font-bold text-brand-dark hover:bg-surface-2">{t("Ver todos os produtos")} →</Link>
+      </div>
+    </div>
   );
 }
 
