@@ -65,7 +65,12 @@ export function Product() {
   function doAdd(buyNow = false) {
     if (out || missingVariant) return;
     cart.add(
-      { productId: p.id, slug: p.slug, name, priceCents, image: p.images[0]?.url ?? "", variant: variantLabel, stock: p.stock },
+      {
+        productId: p.id, slug: p.slug, name, image: p.images[0]?.url ?? "", variant: variantLabel, stock: p.stock,
+        regularCents: p.priceCents + deltaCents,
+        price10Cents: p.price10Cents != null ? p.price10Cents + deltaCents : null,
+        wholesaleCents: p.wholesaleCents != null ? p.wholesaleCents + deltaCents : null,
+      },
       qty,
     );
     if (buyNow) nav("/carrinho");
@@ -128,9 +133,18 @@ export function Product() {
             <span className="font-display text-4xl font-extrabold text-brand tabular">{brl(priceCents)}</span>
             {priceCents >= 3000 && <div className="mt-1 text-sm text-muted tabular">{t("em até {n}x de {each} sem juros", { n: inst.n, each: brl(inst.eachCents) })}</div>}
             <div className="mt-1 text-sm font-bold text-pix tabular">{t("💠 {v} no Pix ({pct}% de desconto)", { v: brl(pixCents(priceCents, p.pixPercent)), pct: p.pixPercent })}</div>
-            {p.wholesaleCents && (
-              <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-grape/10 px-3 py-1.5 text-sm font-bold text-grape">
-                {t("📦 Atacado: {v}", { v: brl(p.wholesaleCents) })} <span className="font-normal text-muted">{t("(mín. {n} un.)", { n: p.minWholesaleQty })}</span>
+            {(p.price10Cents || p.wholesaleCents) && (
+              <div className="mt-3 rounded-xl border border-line bg-surface-2 p-3">
+                <p className="text-xs font-extrabold uppercase tracking-wide text-muted">{t("Preços por volume no carrinho")}</p>
+                <ul className="mt-1.5 space-y-1 text-sm">
+                  {p.price10Cents != null && (
+                    <li className="flex items-center justify-between gap-2"><span>📦 {t("Carrinho com 10+ itens")}</span><b className="text-teal-dark tabular">{brl(p.price10Cents + deltaCents)}</b></li>
+                  )}
+                  {p.wholesaleCents != null && (
+                    <li className="flex items-center justify-between gap-2"><span>🏆 {t("Carrinho no valor de atacado")}</span><b className="text-grape tabular">{brl(p.wholesaleCents + deltaCents)}</b></li>
+                  )}
+                </ul>
+                <p className="mt-1.5 text-[11px] text-muted">{t("Vale para o carrinho todo, misturando qualquer produto.")}</p>
               </div>
             )}
           </div>

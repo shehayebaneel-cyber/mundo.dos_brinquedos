@@ -1,20 +1,31 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useStore } from "./store";
+import { priceCart, type Priced, type Tier } from "./pricing";
 
 export type CartLine = {
   productId: number;
   slug: string;
   name: string;
-  priceCents: number;
   image: string;
   variant: string;
   qty: number;
   stock: number;
+  // three tier prices carried per line so the cart can re-price itself
+  regularCents: number;
+  price10Cents: number | null;
+  wholesaleCents: number | null;
 };
 
 type CartCtx = {
-  lines: CartLine[];
+  lines: Priced<CartLine>[]; // each line carries the active-tier unitCents
   count: number;
-  subtotalCents: number;
+  subtotalCents: number; // at the active tier
+  grossCents: number; // at regular prices
+  savingsCents: number;
+  tier: Tier;
+  itemsToTier2: number;
+  centsToTier3: number;
+  thresholdCents: number;
   add: (line: Omit<CartLine, "qty">, qty?: number) => void;
   setQty: (productId: number, variant: string, qty: number) => void;
   remove: (productId: number, variant: string) => void;
@@ -22,12 +33,32 @@ type CartCtx = {
 };
 
 const Ctx = createContext<CartCtx | null>(null);
-const KEY = "mundo_cart_v1";
+const KEY = "mundo_cart_v2";
+
+// Back-compat: older carts stored a single `priceCents`. Map it to regularCents.
+function normalize(raw: unknown): CartLine[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((l) => ({
+    productId: l.productId,
+    slug: l.slug,
+    name: l.name,
+    image: l.image ?? "",
+    variant: l.variant ?? "",
+    qty: l.qty ?? 1,
+    stock: l.stock ?? 99,
+    regularCents: l.regularCents ?? l.priceCents ?? 0,
+    price10Cents: l.price10Cents ?? null,
+    wholesaleCents: l.wholesaleCents ?? null,
+  }));
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { settings } = useStore();
+  const thresholdCents = Number(settings.wholesaleThresholdCents ?? 30000) || 0;
+
   const [lines, setLines] = useState<CartLine[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem(KEY) ?? "[]");
+      return normalize(JSON.parse(localStorage.getItem(KEY) ?? localStorage.getItem("mundo_cart_v1") ?? "[]"));
     } catch {
       return [];
     }
@@ -44,9 +75,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const k = key(line.productId, line.variant);
       const found = cur.find((l) => key(l.productId, l.variant) === k);
       if (found) {
-        return cur.map((l) =>
-          key(l.productId, l.variant) === k ? { ...l, qty: Math.min(l.stock, l.qty + qty) } : l,
-        );
+        return cur.map((l) => (key(l.productId, l.variant) === k ? { ...l, qty: Math.min(l.stock, l.qty + qty) } : l));
       }
       return [...cur, { ...line, qty: Math.min(line.stock, qty) }];
     });
@@ -65,18 +94,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clear = () => setLines([]);
 
-  const value = useMemo<CartCtx>(
-    () => ({
-      lines,
-      count: lines.reduce((s, l) => s + l.qty, 0),
-      subtotalCents: lines.reduce((s, l) => s + l.priceCents * l.qty, 0),
+  const value = useMemo<CartCtx>(() => {
+    const p = priceCart(lines, thresholdCents);
+    return {
+      lines: p.lines,
+      count: p.totalItems,
+      subtotalCents: p.subtotalCents,
+      grossCents: p.grossCents,
+      savingsCents: p.savingsCents,
+      tier: p.tier,
+      itemsToTier2: p.itemsToTier2,
+      centsToTier3: p.centsToTier3,
+      thresholdCents: p.thresholdCents,
       add,
       setQty,
       remove,
       clear,
-    }),
-    [lines],
-  );
+    };
+  }, [lines, thresholdCents]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

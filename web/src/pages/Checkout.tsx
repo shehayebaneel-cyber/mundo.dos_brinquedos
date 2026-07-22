@@ -143,7 +143,7 @@ export function Checkout() {
             {cart.lines.map((l) => (
               <div key={`${l.productId}-${l.variant}`} className="flex justify-between gap-2">
                 <span className="text-muted">{l.qty}x {l.name}{l.variant ? ` (${l.variant})` : ""}</span>
-                <span className="tabular">{brl(l.priceCents * l.qty)}</span>
+                <span className="tabular">{brl(l.unitCents * l.qty)}</span>
               </div>
             ))}
           </div>

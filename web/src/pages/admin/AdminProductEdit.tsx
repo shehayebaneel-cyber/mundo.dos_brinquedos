@@ -21,7 +21,7 @@ export function AdminProductEdit() {
 
   const [f, setF] = useState({
     slug: "", name: "", brand: "", sku: "", description: "", categoryId: "",
-    price: "", old: "", cost: "", wholesale: "", pixPercent: "10",
+    price: "", old: "", cost: "", price10: "", wholesale: "", pixPercent: "10",
     stock: "", lowStockAt: "5", minWholesaleQty: "0", packQty: "1", installmentsMax: "12",
     ageGroup: "", material: "", weightGrams: "", warranty: "",
     featured: false, isNew: false, bestSeller: false, wholesaleOnly: false, active: true,
@@ -35,7 +35,7 @@ export function AdminProductEdit() {
     api.aGet<Product>(`/api/admin/products/${id}`).then((p) => {
       setF({
         slug: p.slug, name: p.name, brand: p.brand, sku: p.sku, description: p.description, categoryId: String(p.categoryId ?? ""),
-        price: reais(p.priceCents), old: reais(p.oldPriceCents), cost: reais(p.costCents), wholesale: reais(p.wholesaleCents), pixPercent: String(p.pixPercent),
+        price: reais(p.priceCents), old: reais(p.oldPriceCents), cost: reais(p.costCents), price10: reais(p.price10Cents), wholesale: reais(p.wholesaleCents), pixPercent: String(p.pixPercent),
         stock: String(p.stock), lowStockAt: String(p.lowStockAt), minWholesaleQty: String(p.minWholesaleQty), packQty: String(p.packQty), installmentsMax: String(p.installmentsMax),
         ageGroup: p.ageGroup, material: p.material, weightGrams: String(p.weightGrams), warranty: p.warranty,
         featured: p.featured, isNew: p.isNew, bestSeller: p.bestSeller, wholesaleOnly: p.wholesaleOnly, active: p.active,
@@ -56,6 +56,7 @@ export function AdminProductEdit() {
       slug: f.slug || f.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
       name: f.name, brand: f.brand, sku: f.sku, description: f.description, categoryId: f.categoryId || null,
       priceCents: cents(f.price), oldPriceCents: f.old ? cents(f.old) : null, costCents: cents(f.cost),
+      price10Cents: f.price10 ? cents(f.price10) : null,
       wholesaleCents: f.wholesale ? cents(f.wholesale) : null, pixPercent: Number(f.pixPercent),
       stock: Number(f.stock), lowStockAt: Number(f.lowStockAt), minWholesaleQty: Number(f.minWholesaleQty),
       packQty: Number(f.packQty), installmentsMax: Number(f.installmentsMax),
@@ -108,12 +109,16 @@ export function AdminProductEdit() {
         </section>
 
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-3 font-display font-bold text-ink">{t("Preços (R$)")}</h2>
+          <h2 className="mb-1 font-display font-bold text-ink">{t("Preços por nível (R$)")}</h2>
+          <p className="mb-3 text-xs text-muted">{t("O preço muda conforme o carrinho do cliente. Deixe em branco os níveis que não se aplicam.")}</p>
           <div className="grid gap-3 sm:grid-cols-3">
-            <F k="price" label={t("Preço de venda *")} type="number" />
+            <div className="rounded-xl bg-sky/5 p-2"><F k="price" label={t("1 · Preço normal *")} type="number" /><p className="mt-1 px-1 text-[10px] text-muted">{t("menos de 10 itens")}</p></div>
+            <div className="rounded-xl bg-teal/5 p-2"><F k="price10" label={t("2 · Preço 10+ itens")} type="number" /><p className="mt-1 px-1 text-[10px] text-muted">{t("carrinho com 10+ itens")}</p></div>
+            <div className="rounded-xl bg-grape/5 p-2"><F k="wholesale" label={t("3 · Preço atacado")} type="number" /><p className="mt-1 px-1 text-[10px] text-muted">{t("carrinho no valor de atacado")}</p></div>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-4">
             <F k="old" label={t("Preço antigo (de/por)")} type="number" />
             <F k="cost" label={t("Custo")} type="number" />
-            <F k="wholesale" label={t("Preço atacado")} type="number" />
             <F k="pixPercent" label={t("Desconto Pix (%)")} type="number" />
             <F k="installmentsMax" label={t("Parcelas máx.")} type="number" />
           </div>

@@ -42,10 +42,11 @@ model Product {
   descriptionEn   String           @default("")
   categoryId      Int?
   category        Category?        @relation(fields: [categoryId], references: [id])
-  priceCents      Int // retail current price (centavos)
+  priceCents      Int // tier 1 — regular retail price (centavos)
   oldPriceCents   Int? // previous price → shows discount %
   costCents       Int              @default(0)
-  wholesaleCents  Int? // price for approved atacado customers
+  price10Cents    Int? // tier 2 — price when the whole cart has 10+ items
+  wholesaleCents  Int? // tier 3 — price when the cart reaches the wholesale-value threshold
   pixPercent      Int              @default(5) // Pix discount %
   stock           Int              @default(0)
   lowStockAt      Int              @default(5)

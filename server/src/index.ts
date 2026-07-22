@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { PrismaClient } from "@prisma/client";
+import { cartTier, unitForTier, type Tier } from "./pricing.js";
 
 const db = new PrismaClient();
 const app = express();
@@ -142,20 +143,32 @@ app.post("/api/orders", asyncH(async (req, res) => {
   const prods = await db.product.findMany({ where: { id: { in: ids } } });
   const kind = str(b.kind, "varejo");
 
-  let subtotal = 0;
-  const orderItems: { productId: number; name: string; variant: string; priceCents: number; qty: number }[] = [];
+  // Resolve every line against the DB, then apply the cart-wide price tier.
+  // Prices are ALWAYS recomputed here — the client never sets prices.
+  const valid: { p: (typeof prods)[number]; qty: number; variant: string }[] = [];
   for (const it of items) {
     const p = prods.find((x) => x.id === num(it.productId));
     if (!p) return res.status(400).json({ error: "Produto indisponível no carrinho." });
-    const qty = Math.max(1, num(it.qty, 1));
+    valid.push({ p, qty: Math.max(1, num(it.qty, 1)), variant: str(it.variant) });
+  }
+  const thresholdRow = await db.setting.findUnique({ where: { key: "wholesaleThresholdCents" } });
+  const thresholdCents = Number(thresholdRow?.value ?? 30000) || 0;
+  const totalItems = valid.reduce((s, l) => s + l.qty, 0);
+  const grossCents = valid.reduce((s, l) => s + l.p.priceCents * l.qty, 0);
+  // approved wholesale orders always get the best (tier 3) price; everyone else follows the cart tier
+  const tier: Tier = kind === "atacado" ? 3 : cartTier(totalItems, grossCents, thresholdCents);
+
+  let subtotal = 0;
+  const orderItems: { productId: number; name: string; variant: string; priceCents: number; qty: number }[] = [];
+  for (const { p, qty, variant } of valid) {
     if (p.stock < qty) return res.status(409).json({ error: `Estoque insuficiente para ${p.name}. Restam ${p.stock}.` });
-    const unit = kind === "atacado" && p.wholesaleCents ? p.wholesaleCents : p.priceCents;
+    const unit = unitForTier({ regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents }, tier);
     subtotal += unit * qty;
-    orderItems.push({ productId: p.id, name: p.name, variant: str(it.variant), priceCents: unit, qty });
+    orderItems.push({ productId: p.id, name: p.name, variant, priceCents: unit, qty });
   }
 
-  const shippingCents = num(b.shippingCents, 0);
-  const discountCents = num(b.discountCents, 0);
+  const shippingCents = Math.max(0, num(b.shippingCents, 0));
+  const discountCents = Math.min(Math.max(0, num(b.discountCents, 0)), subtotal); // never exceed the subtotal
   const total = subtotal - discountCents + shippingCents;
 
   const count = await db.order.count();
@@ -224,7 +237,9 @@ function productData(b: Record<string, unknown>) {
     slug: str(b.slug), name: str(b.name), brand: str(b.brand), sku: str(b.sku), description: str(b.description),
     categoryId: b.categoryId ? num(b.categoryId) : null,
     priceCents: num(b.priceCents), oldPriceCents: b.oldPriceCents ? num(b.oldPriceCents) : null,
-    costCents: num(b.costCents), wholesaleCents: b.wholesaleCents ? num(b.wholesaleCents) : null,
+    costCents: num(b.costCents),
+    price10Cents: b.price10Cents ? num(b.price10Cents) : null,
+    wholesaleCents: b.wholesaleCents ? num(b.wholesaleCents) : null,
     pixPercent: num(b.pixPercent, 10), stock: num(b.stock), lowStockAt: num(b.lowStockAt, 5),
     minWholesaleQty: num(b.minWholesaleQty), packQty: num(b.packQty, 1), installmentsMax: num(b.installmentsMax, 12),
     ageGroup: str(b.ageGroup), material: str(b.material), weightGrams: num(b.weightGrams), warranty: str(b.warranty),

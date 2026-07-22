@@ -12,7 +12,7 @@ export type Product = {
   id: number; slug: string; name: string; nameEn?: string; brand: string; sku: string;
   description: string; descriptionEn?: string;
   categoryId: number | null; category?: Category | null;
-  priceCents: number; oldPriceCents: number | null; costCents: number; wholesaleCents: number | null;
+  priceCents: number; oldPriceCents: number | null; costCents: number; price10Cents: number | null; wholesaleCents: number | null;
   pixPercent: number; stock: number; lowStockAt: number; minWholesaleQty: number; packQty: number;
   installmentsMax: number; ageGroup: string; material: string; weightGrams: number; warranty: string;
   featured: boolean; isNew: boolean; bestSeller: boolean; wholesaleOnly: boolean; active: boolean;

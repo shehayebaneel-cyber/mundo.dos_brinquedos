@@ -44,6 +44,11 @@ function StoreSettings() {
         {fields.map(([k, label]) => (
           <div key={k} className={k === "address" || k === "mapsUrl" ? "sm:col-span-2" : ""}><label className={lbl}>{t(label)}</label><input value={s[k] ?? ""} onChange={(e) => set(k, e.target.value)} className={input} /></div>
         ))}
+        <div className="sm:col-span-2 rounded-xl bg-grape/5 p-3">
+          <label className={lbl}>{t("Valor do carrinho para o preço de atacado — nível 3 (centavos)")}</label>
+          <input value={s.wholesaleThresholdCents ?? ""} onChange={(e) => set("wholesaleThresholdCents", e.target.value)} className={input} placeholder="30000" />
+          <p className="mt-1 text-[11px] text-muted">{t("Ex.: 30000 = R$300. Quando o carrinho atinge este valor, todos os produtos recebem o preço de atacado (nível 3). O nível 2 é fixo em 10 itens.")}</p>
+        </div>
         <div><label className={lbl}>{t("Pedido mínimo atacado (centavos)")}</label><input value={s.wholesaleMinOrderCents ?? ""} onChange={(e) => set("wholesaleMinOrderCents", e.target.value)} className={input} /></div>
         <div><label className={lbl}>{t("Frete grátis acima de (centavos)")}</label><input value={s.freeShippingMinCents ?? ""} onChange={(e) => set("freeShippingMinCents", e.target.value)} className={input} /></div>
       </div>

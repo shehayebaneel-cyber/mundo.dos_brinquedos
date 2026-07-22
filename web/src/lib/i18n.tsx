@@ -326,6 +326,36 @@ const EN: Record<string, string> = {
   "📦 Atacado: {v}": "📦 Wholesale: {v}",
   "(mín. {n} un.)": "(min. {n} units)",
 
+  // ===== tiered pricing (cart) =====
+  "cada": "each",
+  "Você economiza": "You save",
+  "Nível de preço ativo": "Active price level",
+  "Preço normal": "Regular price",
+  "Preço de 10+ itens": "10+ items price",
+  "Preço de atacado": "Wholesale price",
+  "Economia de {v}": "Saving {v}",
+  "Faltam {n} para o preço de 10+ itens.": "{n} more items for the 10+ items price.",
+  "Ou some {v} em produtos para o preço de atacado.": "Or add {v} in products for the wholesale price.",
+  "Faltam {v} para o preço de atacado — o melhor preço!": "{v} more for the wholesale price — the best price!",
+  "Você desbloqueou o preço de 10+ itens! 🎉": "You unlocked the 10+ items price! 🎉",
+  "Você está no melhor preço. Aproveite! 🎉": "You're at the best price. Enjoy! 🎉",
+  // product page volume block
+  "Preços por volume no carrinho": "Volume prices in the cart",
+  "Carrinho com 10+ itens": "Cart with 10+ items",
+  "Carrinho no valor de atacado": "Cart at wholesale value",
+  "Vale para o carrinho todo, misturando qualquer produto.": "Applies to the whole cart, mixing any products.",
+  // admin price levels
+  "Preços por nível (R$)": "Prices by level (R$)",
+  "O preço muda conforme o carrinho do cliente. Deixe em branco os níveis que não se aplicam.": "The price changes with the customer's cart. Leave the levels that don't apply blank.",
+  "1 · Preço normal *": "1 · Regular price *",
+  "menos de 10 itens": "fewer than 10 items",
+  "2 · Preço 10+ itens": "2 · 10+ items price",
+  "carrinho com 10+ itens": "cart with 10+ items",
+  "3 · Preço atacado": "3 · Wholesale price",
+  "carrinho no valor de atacado": "cart at wholesale value",
+  "Valor do carrinho para o preço de atacado — nível 3 (centavos)": "Cart value for the wholesale price — level 3 (cents)",
+  "Ex.: 30000 = R$300. Quando o carrinho atinge este valor, todos os produtos recebem o preço de atacado (nível 3). O nível 2 é fixo em 10 itens.": "E.g. 30000 = R$300. When the cart reaches this value, every product gets the wholesale price (level 3). Level 2 is fixed at 10 items.",
+
   // ===== ADMIN =====
   "Carregando…": "Loading…",
   "pt-BR": "en-US",
