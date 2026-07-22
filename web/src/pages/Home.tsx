@@ -26,7 +26,6 @@ export function Home() {
   const novidades = list.filter((p) => p.isNew).slice(0, 12);
   const best = list.slice().sort((a, b) => Number(b.bestSeller) - Number(a.bestSeller)).slice(0, 12);
   const ofertas = list.filter((p) => p.oldPriceCents).slice(0, 12);
-  const byCat = (slug: string) => list.filter((p) => p.category?.slug === slug).slice(0, 12);
 
   return (
     <div className="space-y-12 pb-6">
@@ -134,18 +133,12 @@ export function Home() {
             </section>
 
             {/* ======================= NEW ARRIVALS ======================= */}
-            <section><SectionHead title={t("Novidades")} emoji="✨" to="/produtos?flag=novidades" /><ProductRow items={novidades} /></section>
+            {novidades.length > 0 && (
+              <section><SectionHead title={t("Novidades")} emoji="✨" to="/produtos?flag=novidades" /><ProductRow items={novidades} /></section>
+            )}
 
             {/* ======================= BEST SELLERS ======================= */}
             <section><SectionHead title={t("Mais vendidos")} emoji="🔥" to="/produtos?flag=mais-vendidos" /><ProductRow items={best} /></section>
-
-            {/* ======================= CATEGORY ROWS ======================= */}
-            {categories.slice(0, 2).map((c) => (
-              <section key={c.id}>
-                <SectionHead title={tf(c, "name")} emoji={c.emoji} to={`/categoria/${c.slug}`} />
-                <ProductRow items={byCat(c.slug)} />
-              </section>
-            ))}
 
             {/* ======================= WHOLESALE ======================= */}
             <section className="relative overflow-hidden rounded-[30px] bg-grape p-6 text-white sm:p-9">
