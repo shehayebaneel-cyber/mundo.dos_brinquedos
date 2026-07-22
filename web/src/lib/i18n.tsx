@@ -90,6 +90,8 @@ const EN: Record<string, string> = {
   "Cor": "Colour",
   "Tamanho": "Size",
   "Tamanho / capacidade": "Size / capacity",
+  "Subcategoria": "Subcategory",
+  "ex.: Motos, Quebra-cabeças": "e.g. Motos, Puzzles",
   "Em breve — em atualização.": "Coming soon — being updated.",
   "Avaliação": "Rating",
   "Estoque baixo": "Low stock",

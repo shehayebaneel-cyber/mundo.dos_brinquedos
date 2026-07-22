@@ -53,6 +53,7 @@ model Product {
   minWholesaleQty Int              @default(0)
   packQty         Int              @default(1) // units per box/package
   installmentsMax Int              @default(12)
+  subcat          String           @default("") // subcategory within its category (e.g. Motos, Quebra-cabeças)
   ageGroup        String           @default("")
   material        String           @default("")
   weightGrams     Int              @default(0)

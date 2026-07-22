@@ -23,7 +23,7 @@ export function AdminProductEdit() {
     slug: "", name: "", brand: "", sku: "", description: "", categoryId: "",
     price: "", old: "", cost: "", price10: "", wholesale: "", pixPercent: "10",
     stock: "", lowStockAt: "5", minWholesaleQty: "0", packQty: "1", installmentsMax: "12",
-    ageGroup: "", material: "", weightGrams: "", warranty: "",
+    subcat: "", ageGroup: "", material: "", weightGrams: "", warranty: "",
     featured: false, isNew: false, bestSeller: false, wholesaleOnly: false, active: true,
   });
   const [images, setImages] = useState<ImgRow[]>([{ url: "🧸|#fff0f2", alt: "" }]);
@@ -37,7 +37,7 @@ export function AdminProductEdit() {
         slug: p.slug, name: p.name, brand: p.brand, sku: p.sku, description: p.description, categoryId: String(p.categoryId ?? ""),
         price: reais(p.priceCents), old: reais(p.oldPriceCents), cost: reais(p.costCents), price10: reais(p.price10Cents), wholesale: reais(p.wholesaleCents), pixPercent: String(p.pixPercent),
         stock: String(p.stock), lowStockAt: String(p.lowStockAt), minWholesaleQty: String(p.minWholesaleQty), packQty: String(p.packQty), installmentsMax: String(p.installmentsMax),
-        ageGroup: p.ageGroup, material: p.material, weightGrams: String(p.weightGrams), warranty: p.warranty,
+        subcat: p.subcat, ageGroup: p.ageGroup, material: p.material, weightGrams: String(p.weightGrams), warranty: p.warranty,
         featured: p.featured, isNew: p.isNew, bestSeller: p.bestSeller, wholesaleOnly: p.wholesaleOnly, active: p.active,
       });
       setImages(p.images.length ? p.images.map((i) => ({ url: i.url, alt: i.alt })) : [{ url: "🧸|#fff0f2", alt: "" }]);
@@ -60,7 +60,7 @@ export function AdminProductEdit() {
       wholesaleCents: f.wholesale ? cents(f.wholesale) : null, pixPercent: Number(f.pixPercent),
       stock: Number(f.stock), lowStockAt: Number(f.lowStockAt), minWholesaleQty: Number(f.minWholesaleQty),
       packQty: Number(f.packQty), installmentsMax: Number(f.installmentsMax),
-      ageGroup: f.ageGroup, material: f.material, weightGrams: Number(f.weightGrams), warranty: f.warranty,
+      subcat: f.subcat, ageGroup: f.ageGroup, material: f.material, weightGrams: Number(f.weightGrams), warranty: f.warranty,
       featured: f.featured, isNew: f.isNew, bestSeller: f.bestSeller, wholesaleOnly: f.wholesaleOnly, active: f.active,
       images: images.filter((i) => i.url.trim()),
       variants: variants.map((v) => ({ kind: v.kind, label: v.label, swatch: v.swatch, stock: Number(v.stock), priceDeltaCents: cents(v.priceDeltaReais) })),
@@ -138,6 +138,7 @@ export function AdminProductEdit() {
         <section className="rounded-[16px] border border-line bg-surface p-4">
           <h2 className="mb-3 font-display font-bold text-ink">{t("Ficha técnica")}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
+            <F k="subcat" label={t("Subcategoria")} ph={t("ex.: Motos, Quebra-cabeças")} />
             <F k="ageGroup" label={t("Idade recomendada")} ph="3+" />
             <F k="material" label={t("Material")} />
             <F k="warranty" label={t("Garantia")} />

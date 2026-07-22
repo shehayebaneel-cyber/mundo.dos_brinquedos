@@ -242,7 +242,7 @@ function productData(b: Record<string, unknown>) {
     wholesaleCents: b.wholesaleCents ? num(b.wholesaleCents) : null,
     pixPercent: num(b.pixPercent, 10), stock: num(b.stock), lowStockAt: num(b.lowStockAt, 5),
     minWholesaleQty: num(b.minWholesaleQty), packQty: num(b.packQty, 1), installmentsMax: num(b.installmentsMax, 12),
-    ageGroup: str(b.ageGroup), material: str(b.material), weightGrams: num(b.weightGrams), warranty: str(b.warranty),
+    subcat: str(b.subcat), ageGroup: str(b.ageGroup), material: str(b.material), weightGrams: num(b.weightGrams), warranty: str(b.warranty),
     featured: bool(b.featured), isNew: bool(b.isNew), bestSeller: bool(b.bestSeller),
     wholesaleOnly: bool(b.wholesaleOnly), active: b.active === undefined ? true : bool(b.active),
   };

@@ -20,6 +20,7 @@ const SORTS = [
 type Filters = {
   priceMin: string;
   priceMax: string;
+  subcats: string[];
   brands: string[];
   ages: string[];
   colours: string[];
@@ -33,7 +34,7 @@ type Filters = {
   minRating: number;
 };
 const EMPTY: Filters = {
-  priceMin: "", priceMax: "", brands: [], ages: [], colours: [], sizes: [],
+  priceMin: "", priceMax: "", subcats: [], brands: [], ages: [], colours: [], sizes: [],
   inStock: false, lowStock: false, onSale: false, isNew: false, bestSeller: false, wholesale: false, minRating: 0,
 };
 
@@ -69,6 +70,7 @@ export function Shop({ mode }: { mode?: "ofertas" | "search" | "all" }) {
   // facets derived from the fetched set
   const facets = useMemo(() => {
     const list = items ?? [];
+    const subcats = [...new Set(list.map((p) => p.subcat).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt", { numeric: true }));
     const brands = [...new Set(list.map((p) => p.brand).filter(Boolean))].sort();
     const ages = [...new Set(list.map((p) => p.ageGroup).filter(Boolean))].sort();
     const colourMap = new Map<string, string>();
@@ -78,11 +80,12 @@ export function Shop({ mode }: { mode?: "ofertas" | "search" | "all" }) {
         if (v.kind.includes("cor")) colourMap.set(v.label, v.swatch || "#ddd");
         if (v.kind.includes("tamanho")) sizes.add(v.label);
       }
-    return { brands, ages, colours: [...colourMap.entries()], sizes: [...sizes] };
+    return { subcats, brands, ages, colours: [...colourMap.entries()], sizes: [...sizes] };
   }, [items]);
 
   const filtered = useMemo(() => {
     let list = items ?? [];
+    if (f.subcats.length) list = list.filter((p) => f.subcats.includes(p.subcat));
     if (f.priceMin) list = list.filter((p) => p.priceCents >= Number(f.priceMin) * 100);
     if (f.priceMax) list = list.filter((p) => p.priceCents <= Number(f.priceMax) * 100);
     if (f.brands.length) list = list.filter((p) => f.brands.includes(p.brand));
@@ -112,7 +115,7 @@ export function Shop({ mode }: { mode?: "ofertas" | "search" | "all" }) {
   }, [items, f, sort]);
 
   const activeCount =
-    (f.priceMin || f.priceMax ? 1 : 0) + f.brands.length + f.ages.length + f.colours.length + f.sizes.length +
+    (f.priceMin || f.priceMax ? 1 : 0) + f.subcats.length + f.brands.length + f.ages.length + f.colours.length + f.sizes.length +
     [f.inStock, f.lowStock, f.onSale, f.isNew, f.bestSeller, f.wholesale].filter(Boolean).length + (f.minRating ? 1 : 0);
 
   const title = mode === "search" ? t('Busca: "{q}"', { q }) : mode === "ofertas" ? t("Ofertas") : cat ? tf(cat, "name") : t("Todos os produtos");
@@ -213,7 +216,7 @@ function FilterPanel({
   f, facets, upd, toggleIn, t,
 }: {
   f: Filters;
-  facets: { brands: string[]; ages: string[]; colours: [string, string][]; sizes: string[] };
+  facets: { subcats: string[]; brands: string[]; ages: string[]; colours: [string, string][]; sizes: string[] };
   upd: (p: Partial<Filters>) => void;
   toggleIn: (arr: string[], v: string) => string[];
   t: (s: string, p?: Record<string, string | number>) => string;
@@ -224,6 +227,18 @@ function FilterPanel({
   ];
   return (
     <div className="space-y-5 text-sm">
+      {facets.subcats.length > 0 && (
+        <Group title={t("Subcategoria")}>
+          <div className="flex flex-wrap gap-2">
+            {facets.subcats.map((s) => (
+              <button key={s} onClick={() => upd({ subcats: toggleIn(f.subcats, s) })} className={`rounded-full border px-3 py-1.5 text-xs font-bold ${f.subcats.includes(s) ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink hover:border-brand/40"}`}>
+                {s}
+              </button>
+            ))}
+          </div>
+        </Group>
+      )}
+
       {/* quick toggles */}
       <div className="flex flex-wrap gap-2">
         {toggles.map(([k, label]) => (
