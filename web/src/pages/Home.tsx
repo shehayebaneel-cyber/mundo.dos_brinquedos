@@ -54,16 +54,20 @@ export function Home() {
           {/* brand mascot composition */}
           <div className="relative z-10 hidden lg:block">
             <div className="relative mx-auto aspect-square max-w-[440px]">
-              <div className="absolute inset-8 rounded-full bg-white/10" />
+              {/* spotlight halo for depth */}
+              <div className="absolute inset-6 rounded-full bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.30),rgba(255,255,255,0.05)_62%,transparent_74%)]" />
               <BlobFace className="absolute left-0 top-6 h-16 w-16 text-yellow drop-shadow" />
               <BlobFace className="absolute -right-1 bottom-14 h-14 w-14 text-brand drop-shadow" />
               <Star className="absolute right-12 top-0 h-9 w-9 text-yellow" />
               <Star className="absolute left-16 bottom-6 h-5 w-5 text-white/70" />
               <DashLoop className="absolute right-2 top-20 h-16 w-20 text-white/40" />
-              <img src="/mascot.png" alt="" className="relative z-10 mx-auto h-full w-auto object-contain [filter:drop-shadow(0_12px_20px_rgba(0,0,0,0.25))]" />
-              <span className="absolute left-1 top-24 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🧸</span>
-              <span className="absolute right-0 top-8 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🎈</span>
-              <span className="absolute bottom-2 left-16 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🎨</span>
+              {/* ground shadow (synced with bounce) */}
+              <div className="animate-mascot-shadow absolute bottom-4 left-1/2 z-0 h-4 w-44 rounded-[50%] bg-[#081633] blur-md" />
+              {/* mascot */}
+              <img src="/mascot.png" alt="Mundo dos Brinquedos" className="animate-mascot relative z-10 mx-auto h-full w-auto object-contain" />
+              <span className="absolute left-1 top-24 z-20 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🧸</span>
+              <span className="absolute right-0 top-8 z-20 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🎈</span>
+              <span className="absolute bottom-2 left-16 z-20 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🎨</span>
             </div>
           </div>
         </div>

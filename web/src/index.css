@@ -132,6 +132,22 @@
   }
 }
 
+/* hero mascot: gentle 3D bounce + synced ground shadow */
+@keyframes mascot-bounce {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-18px) rotate(1deg); }
+}
+@keyframes mascot-shadow {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.38; }
+  50% { transform: translateX(-50%) scaleX(0.78); opacity: 0.22; }
+}
+.animate-mascot {
+  animation: mascot-bounce 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 22px 16px rgba(16, 42, 90, 0.45));
+  will-change: transform;
+}
+.animate-mascot-shadow { animation: mascot-shadow 2.6s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
