@@ -9,8 +9,8 @@ export function Footer() {
     <footer className="mt-12 bg-ink px-4 pb-24 pt-10 text-sm text-white/75 md:pb-10">
       <div className="mx-auto grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <div className="font-display text-lg font-extrabold text-white">{settings.storeName ?? "Mundo dos Brinquedos"}</div>
-          <p className="mt-2 leading-relaxed">{tf(settings, "tagline")}</p>
+          <img src="/logo-dark.png" alt={settings.storeName ?? "Mundo dos Brinquedos e Variedades"} className="h-14 w-auto" />
+          <p className="mt-3 leading-relaxed">{tf(settings, "tagline")}</p>
           <p className="mt-3">📍 {settings.address}</p>
           <p>🕗 {t(settings.hours ?? "")}</p>
           <a href={settings.mapsUrl} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sun">{t("Ver no mapa →")}</a>

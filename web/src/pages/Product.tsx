@@ -97,9 +97,10 @@ export function Product() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* GALLERY */}
         <div>
-          <div className="relative aspect-square overflow-hidden rounded-[16px] border border-line bg-surface">
-            <Thumb url={p.images[imgIdx]?.url} alt={name} emojiSize="text-[120px]" />
-            {off > 0 && <span className="absolute left-3 top-3 rounded-full bg-brand px-2.5 py-1 text-sm font-extrabold text-white">-{off}%</span>}
+          <div className="relative aspect-square overflow-hidden rounded-[22px] border-2 border-line bg-white p-3">
+            <span className="absolute inset-x-0 top-0 z-10 h-1.5" style={{ background: `var(--color-${p.category?.accent ?? "brand"})` }} />
+            <Thumb url={p.images[imgIdx]?.url} alt={name} emojiSize="text-[120px]" fit="contain" className="rounded-2xl" />
+            {off > 0 && <span className="absolute left-3 top-4 z-10 rounded-full bg-brand px-2.5 py-1 text-sm font-extrabold text-white">-{off}%</span>}
           </div>
           {p.images.length > 1 && (
             <div className="mt-2 flex gap-2">
@@ -116,16 +117,17 @@ export function Product() {
         <div>
           {p.brand && <span className="text-xs font-bold uppercase tracking-wide text-muted">{p.brand}</span>}
           <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">{name}</h1>
-          <div className="mt-1 flex items-center gap-2 text-sm">
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm">
             {avg > 0 && <><Stars value={avg} /><span className="text-muted">({p.reviews?.length})</span></>}
+            {p.ageGroup && <span className="rounded-full bg-teal/15 px-2.5 py-0.5 text-xs font-extrabold text-teal-dark">{p.ageGroup}</span>}
             <span className="text-muted">· SKU {p.sku || "—"}</span>
           </div>
 
           <div className="mt-4">
             {p.oldPriceCents && <span className="mr-2 text-muted line-through tabular">{brl(p.oldPriceCents)}</span>}
-            <span className="font-display text-3xl font-extrabold text-ink tabular">{brl(priceCents)}</span>
-            <div className="mt-1 text-sm text-muted tabular">{t("em até {n}x de {each} sem juros", { n: inst.n, each: brl(inst.eachCents) })}</div>
-            <div className="text-sm font-bold text-pix tabular">{t("💠 {v} no Pix ({pct}% de desconto)", { v: brl(pixCents(priceCents, p.pixPercent)), pct: p.pixPercent })}</div>
+            <span className="font-display text-4xl font-extrabold text-brand tabular">{brl(priceCents)}</span>
+            {priceCents >= 3000 && <div className="mt-1 text-sm text-muted tabular">{t("em até {n}x de {each} sem juros", { n: inst.n, each: brl(inst.eachCents) })}</div>}
+            <div className="mt-1 text-sm font-bold text-pix tabular">{t("💠 {v} no Pix ({pct}% de desconto)", { v: brl(pixCents(priceCents, p.pixPercent)), pct: p.pixPercent })}</div>
             {p.wholesaleCents && (
               <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-grape/10 px-3 py-1.5 text-sm font-bold text-grape">
                 {t("📦 Atacado: {v}", { v: brl(p.wholesaleCents) })} <span className="font-normal text-muted">{t("(mín. {n} un.)", { n: p.minWholesaleQty })}</span>

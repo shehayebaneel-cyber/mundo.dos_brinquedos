@@ -45,7 +45,7 @@ export function AdminLayout() {
       <div className="grid min-h-screen place-items-center bg-cream px-4">
         <form onSubmit={login} className="w-full max-w-sm rounded-[16px] border border-line bg-surface p-6 shadow-[var(--shadow-card)]">
           <div className="flex items-center justify-between">
-            <div className="font-display text-2xl font-extrabold text-brand-dark">Mundo · Admin</div>
+            <img src="/logo.png" alt="Mundo dos Brinquedos e Variedades" className="h-11 w-auto" />
             <LangToggle />
           </div>
           <p className="mt-1 text-sm text-muted">{t("Painel da loja. Informe sua chave de acesso.")}</p>

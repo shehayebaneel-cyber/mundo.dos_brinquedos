@@ -26,6 +26,15 @@
   --color-mint: #21c197;
   --color-grape: #8b5cf6;
 
+  /* --- bold primary play palette (Zoop-inspired: blue/yellow/red/teal/orange) --- */
+  --color-blue: #1f6fe5;
+  --color-blue-dark: #1657bd;
+  --color-teal: #10bfae;
+  --color-teal-dark: #0a9a8c;
+  --color-orange: #ff8b25;
+  --color-orange-dark: #f2760a;
+  --color-yellow: #ffcb2e;
+
   /* --- semantic --- */
   --color-pix: #129d63; /* Pix / success green */
   --color-danger: #e11d3f;
@@ -90,6 +99,27 @@
   }
   .chip-active {
     @apply border-brand bg-brand text-white;
+  }
+  /* playful shadow used on hero / promo blocks */
+  .shadow-play {
+    box-shadow: 0 18px 44px -20px rgba(31, 111, 229, 0.5);
+  }
+  /* section title with the rounded display face */
+  .h-fun {
+    @apply font-display font-extrabold tracking-tight text-ink;
+  }
+}
+
+@layer utilities {
+  /* organic rounded "blob" corners for category badges & promo shapes */
+  .blob-1 { border-radius: 42% 58% 63% 37% / 47% 41% 59% 53%; }
+  .blob-2 { border-radius: 63% 37% 42% 58% / 55% 60% 40% 45%; }
+  .blob-3 { border-radius: 50% 50% 46% 54% / 60% 56% 44% 40%; }
+  .blob-squircle { border-radius: 34% 34% 34% 34% / 34% 34% 34% 34%; }
+  /* faint dotted play texture for coloured bands */
+  .dots {
+    background-image: radial-gradient(currentColor 1.4px, transparent 1.4px);
+    background-size: 20px 20px;
   }
 }
 

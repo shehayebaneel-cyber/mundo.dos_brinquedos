@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "slime-massinha",
+    "name": "Slime & Massinha",
+    "emoji": "🟢",
+    "accent": "mint"
+  },
+  {
+    "slug": "bolhas-de-sabao",
+    "name": "Bolhas de Sabão",
+    "emoji": "🫧",
+    "accent": "sky"
+  },
+  {
+    "slug": "cartas-jogos",
+    "name": "Cartas & Jogos",
+    "emoji": "🃏",
+    "accent": "brand"
+  },
+  {
+    "slug": "agua-praia",
+    "name": "Água & Praia",
+    "emoji": "🌊",
+    "accent": "sky"
+  },
+  {
+    "slug": "bonecas-bichinhos",
+    "name": "Bonecas & Bichinhos",
+    "emoji": "🧸",
+    "accent": "grape"
+  },
+  {
+    "slug": "diversos",
+    "name": "Diversos & Novidades",
+    "emoji": "✨",
+    "accent": "sun"
+  }
+]

@@ -22,3 +22,8 @@ npm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# local design-review mock (not for production)
+/mock-api.mjs
+/mock-products.json
+/mock-cats.json
