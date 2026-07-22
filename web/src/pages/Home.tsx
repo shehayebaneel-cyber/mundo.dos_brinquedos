@@ -26,7 +26,6 @@ export function Home() {
   const novidades = list.filter((p) => p.isNew).slice(0, 12);
   const best = list.slice().sort((a, b) => Number(b.bestSeller) - Number(a.bestSeller)).slice(0, 12);
   const ofertas = list.filter((p) => p.oldPriceCents).slice(0, 12);
-  const heroPics = list.slice(0, 4);
   const byCat = (slug: string) => list.filter((p) => p.category?.slug === slug).slice(0, 12);
 
   return (
@@ -53,17 +52,20 @@ export function Home() {
               <Link to="/atacado" className="btn border-2 border-white/70 px-5 py-2.5 text-white hover:bg-white/10">📦 {t("Atacado")}</Link>
             </div>
           </div>
-          {/* floating real product tiles */}
-          <div className="relative z-10 ml-auto hidden max-w-[420px] grid-cols-2 gap-2.5 lg:grid">
-            {heroPics.slice(0, 4).map((p, i) => (
-              <Link key={p.id} to={`/produto/${p.slug}`} className={`overflow-hidden rounded-2xl bg-white p-1.5 shadow-play ${i % 2 ? "translate-y-3" : ""}`}>
-                <img src={p.images[0]?.url} alt={p.name} className="aspect-[5/4] w-full rounded-xl object-contain" />
-                <div className="px-1.5 py-1">
-                  <div className="truncate text-xs font-bold text-ink">{p.name}</div>
-                  <div className="font-display text-sm font-extrabold text-brand">{brl(p.priceCents)}</div>
-                </div>
-              </Link>
-            ))}
+          {/* brand mascot composition */}
+          <div className="relative z-10 hidden lg:block">
+            <div className="relative mx-auto aspect-square max-w-[440px]">
+              <div className="absolute inset-8 rounded-full bg-white/10" />
+              <BlobFace className="absolute left-0 top-6 h-16 w-16 text-yellow drop-shadow" />
+              <BlobFace className="absolute -right-1 bottom-14 h-14 w-14 text-brand drop-shadow" />
+              <Star className="absolute right-12 top-0 h-9 w-9 text-yellow" />
+              <Star className="absolute left-16 bottom-6 h-5 w-5 text-white/70" />
+              <DashLoop className="absolute right-2 top-20 h-16 w-20 text-white/40" />
+              <img src="/mascot.png" alt="" className="relative z-10 mx-auto h-full w-auto object-contain [filter:drop-shadow(0_12px_20px_rgba(0,0,0,0.25))]" />
+              <span className="absolute left-1 top-24 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🧸</span>
+              <span className="absolute right-0 top-8 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🎈</span>
+              <span className="absolute bottom-2 left-16 grid h-12 w-12 place-items-center rounded-2xl bg-white text-2xl shadow-play">🎨</span>
+            </div>
           </div>
         </div>
         <Wave className="block h-6 w-full text-cream sm:h-9" />
