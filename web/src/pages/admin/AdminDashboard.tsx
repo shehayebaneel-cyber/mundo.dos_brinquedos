@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/api";
 import { brl } from "../../lib/money";
+import { useI18n } from "../../lib/i18n";
 
 type Overview = {
   ordersTotal: number; pending: number; awaitingShipment: number;
@@ -12,11 +13,12 @@ type Overview = {
 };
 
 export function AdminDashboard() {
+  const { t } = useI18n();
   const [o, setO] = useState<Overview | null>(null);
   useEffect(() => {
     api.aGet<Overview>("/api/admin/overview").then(setO).catch(() => {});
   }, []);
-  if (!o) return <p className="text-muted">Carregando…</p>;
+  if (!o) return <p className="text-muted">{t("Carregando…")}</p>;
 
   const Card = ({ label, value, tone = "text-ink", sub }: { label: string; value: string; tone?: string; sub?: string }) => (
     <div className="rounded-[16px] border border-line bg-surface p-4">
@@ -28,31 +30,31 @@ export function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="mb-4 font-display text-2xl font-extrabold text-ink">Painel</h1>
+      <h1 className="mb-4 font-display text-2xl font-extrabold text-ink">{t("Painel")}</h1>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Card label="Faturamento (pago)" value={brl(o.revenueCents)} tone="text-pix" sub={`Mês: ${brl(o.revenueMonthCents)}`} />
-        <Card label="Pedidos" value={String(o.ordersTotal)} sub={`${o.pending} aguardando pagamento`} />
-        <Card label="Ticket médio" value={brl(o.avgTicketCents)} />
-        <Card label="A enviar" value={String(o.awaitingShipment)} tone="text-warn" />
-        <Card label="Varejo" value={brl(o.retailCents)} />
-        <Card label="Atacado" value={brl(o.wholesaleCents)} tone="text-grape" />
-        <Card label="Produtos" value={String(o.productsTotal)} />
-        <Card label="Clientes" value={String(o.customers)} />
+        <Card label={t("Faturamento (pago)")} value={brl(o.revenueCents)} tone="text-pix" sub={t("Mês: {v}", { v: brl(o.revenueMonthCents) })} />
+        <Card label={t("Pedidos")} value={String(o.ordersTotal)} sub={t("{n} aguardando pagamento", { n: o.pending })} />
+        <Card label={t("Ticket médio")} value={brl(o.avgTicketCents)} />
+        <Card label={t("A enviar")} value={String(o.awaitingShipment)} tone="text-warn" />
+        <Card label={t("Varejo")} value={brl(o.retailCents)} />
+        <Card label={t("Atacado")} value={brl(o.wholesaleCents)} tone="text-grape" />
+        <Card label={t("Produtos")} value={String(o.productsTotal)} />
+        <Card label={t("Clientes")} value={String(o.customers)} />
       </div>
 
-      <h2 className="mb-2 mt-6 font-display text-lg font-extrabold text-ink">Precisa de atenção</h2>
+      <h2 className="mb-2 mt-6 font-display text-lg font-extrabold text-ink">{t("Precisa de atenção")}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Alert to="/admin/produtos" label="Sem estoque" n={o.outStock} tone="bg-danger/10 text-danger" />
-        <Alert to="/admin/produtos" label="Estoque baixo" n={o.lowStock} tone="bg-warn/10 text-warn" />
-        <Alert to="/admin/atacado" label="Atacado pendente" n={o.wholesalePending} tone="bg-grape/10 text-grape" />
-        <Alert to="/admin/avaliacoes" label="Avaliações a aprovar" n={o.reviewsPending} tone="bg-sky/10 text-sky" />
+        <Alert to="/admin/produtos" label={t("Sem estoque")} n={o.outStock} tone="bg-danger/10 text-danger" />
+        <Alert to="/admin/produtos" label={t("Estoque baixo")} n={o.lowStock} tone="bg-warn/10 text-warn" />
+        <Alert to="/admin/atacado" label={t("Atacado pendente")} n={o.wholesalePending} tone="bg-grape/10 text-grape" />
+        <Alert to="/admin/avaliacoes" label={t("Avaliações a aprovar")} n={o.reviewsPending} tone="bg-sky/10 text-sky" />
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        <Link to="/admin/produtos/novo" className="btn btn-primary px-5 py-2.5">+ Novo produto</Link>
-        <Link to="/admin/pedidos" className="btn btn-ghost px-5 py-2.5">Ver pedidos</Link>
-        <Link to="/admin/conteudo" className="btn btn-ghost px-5 py-2.5">Editar loja</Link>
+        <Link to="/admin/produtos/novo" className="btn btn-primary px-5 py-2.5">{t("+ Novo produto")}</Link>
+        <Link to="/admin/pedidos" className="btn btn-ghost px-5 py-2.5">{t("Ver pedidos")}</Link>
+        <Link to="/admin/conteudo" className="btn btn-ghost px-5 py-2.5">{t("Editar loja")}</Link>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { api, getAdminKey, setAdminKey } from "../../lib/api";
+import { useI18n } from "../../lib/i18n";
 
 const NAV = [
   ["/admin", "Painel", "📊", true],
@@ -13,6 +14,7 @@ const NAV = [
 ] as const;
 
 export function AdminLayout() {
+  const { t } = useI18n();
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [key, setKey] = useState(getAdminKey());
   const [err, setErr] = useState("");
@@ -31,24 +33,27 @@ export function AdminLayout() {
       await api.aGet("/api/admin/overview");
       setAuthed(true);
     } catch {
-      setErr("Chave incorreta.");
+      setErr(t("Chave incorreta."));
       setAuthed(false);
     }
   }
 
-  if (authed === null) return <div className="grid min-h-screen place-items-center text-muted">Carregando…</div>;
+  if (authed === null) return <div className="grid min-h-screen place-items-center text-muted">{t("Carregando…")}</div>;
 
   if (!authed) {
     return (
       <div className="grid min-h-screen place-items-center bg-cream px-4">
         <form onSubmit={login} className="w-full max-w-sm rounded-[16px] border border-line bg-surface p-6 shadow-[var(--shadow-card)]">
-          <div className="font-display text-2xl font-extrabold text-brand-dark">Mundo · Admin</div>
-          <p className="mt-1 text-sm text-muted">Painel da loja. Informe sua chave de acesso.</p>
-          <input value={key} onChange={(e) => setKey(e.target.value)} type="password" placeholder="Chave de acesso" className="mt-4 w-full rounded-lg border border-line px-3 py-2.5 text-sm" />
+          <div className="flex items-center justify-between">
+            <div className="font-display text-2xl font-extrabold text-brand-dark">Mundo · Admin</div>
+            <LangToggle />
+          </div>
+          <p className="mt-1 text-sm text-muted">{t("Painel da loja. Informe sua chave de acesso.")}</p>
+          <input value={key} onChange={(e) => setKey(e.target.value)} type="password" placeholder={t("Chave de acesso")} className="mt-4 w-full rounded-lg border border-line px-3 py-2.5 text-sm" />
           {err && <p className="mt-2 text-sm font-semibold text-danger">{err}</p>}
-          <button className="btn btn-primary mt-3 w-full py-3">Entrar</button>
-          <p className="mt-3 text-center text-xs text-muted">Protótipo: a chave é <code className="rounded bg-surface-2 px-1">mundo123</code></p>
-          <Link to="/" className="mt-3 block text-center text-xs text-muted hover:text-brand-dark">← Voltar para a loja</Link>
+          <button className="btn btn-primary mt-3 w-full py-3">{t("Entrar")}</button>
+          <p className="mt-3 text-center text-xs text-muted">{t("Protótipo: a chave é")} <code className="rounded bg-surface-2 px-1">mundo123</code></p>
+          <Link to="/" className="mt-3 block text-center text-xs text-muted hover:text-brand-dark">{t("← Voltar para a loja")}</Link>
         </form>
       </div>
     );
@@ -59,17 +64,20 @@ export function AdminLayout() {
       {/* sidebar (desktop) */}
       <aside className="hidden w-60 shrink-0 border-r border-line bg-surface lg:block">
         <div className="sticky top-0 p-4">
-          <Link to="/admin" className="font-display text-xl font-extrabold text-brand-dark">Mundo · Admin</Link>
+          <div className="flex items-center justify-between gap-2">
+            <Link to="/admin" className="font-display text-xl font-extrabold text-brand-dark">Mundo · Admin</Link>
+            <LangToggle />
+          </div>
           <nav className="mt-4 flex flex-col gap-1">
             {NAV.map(([to, label, icon, end]) => (
               <NavLink key={to} to={to} end={end as boolean} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${isActive ? "bg-brand text-white" : "text-ink hover:bg-surface-2"}`}>
-                <span>{icon}</span> {label}
+                <span>{icon}</span> {t(label)}
               </NavLink>
             ))}
           </nav>
           <div className="mt-6 border-t border-line pt-3">
-            <a href="/" className="block rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface-2">🛍️ Ver a loja</a>
-            <button onClick={() => { setAdminKey(""); nav("/admin"); location.reload(); }} className="w-full rounded-lg px-3 py-2 text-left text-sm text-muted hover:bg-surface-2">🚪 Sair</button>
+            <a href="/" className="block rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface-2">{t("🛍️ Ver a loja")}</a>
+            <button onClick={() => { setAdminKey(""); nav("/admin"); location.reload(); }} className="w-full rounded-lg px-3 py-2 text-left text-sm text-muted hover:bg-surface-2">{t("🚪 Sair")}</button>
           </div>
         </div>
       </aside>
@@ -78,14 +86,30 @@ export function AdminLayout() {
       <div className="sticky top-0 z-20 flex items-center gap-2 overflow-x-auto border-b border-line bg-surface px-3 py-2 lg:hidden">
         {NAV.map(([to, label, icon, end]) => (
           <NavLink key={to} to={to} end={end as boolean} className={({ isActive }) => `whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold ${isActive ? "bg-brand text-white" : "bg-surface-2 text-ink"}`}>
-            {icon} {label}
+            {icon} {t(label)}
           </NavLink>
         ))}
+        <LangToggle className="ml-auto shrink-0" />
       </div>
 
       <main className="flex-1 p-4 lg:p-6">
         <Outlet />
       </main>
     </div>
+  );
+}
+
+function LangToggle({ className = "" }: { className?: string }) {
+  const { lang, setLang } = useI18n();
+  return (
+    <button
+      type="button"
+      onClick={() => setLang(lang === "pt" ? "en" : "pt")}
+      className={`flex items-center gap-1 rounded-full border border-line px-2.5 py-1 text-xs font-bold text-ink ${className}`}
+      aria-label={lang === "pt" ? "Switch to English" : "Mudar para português"}
+      title={lang === "pt" ? "Switch to English" : "Mudar para português"}
+    >
+      {lang === "pt" ? "🇧🇷 PT" : "🇺🇸 EN"}
+    </button>
   );
 }

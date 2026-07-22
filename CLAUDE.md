@@ -70,7 +70,12 @@ wholesale access.
   overlay: PT strings are the keys, `t()` returns the EN value in English mode,
   `tf(obj,"name")` picks `nameEn`/`descriptionEn`/`blurbEn`/banner `*En` fields.
 - DB has English columns (Product.nameEn/descriptionEn, Category.nameEn/blurbEn,
-  Banner.*En, Setting taglineEn) seeded for all sample data. Admin stays Portuguese.
+  Banner.*En, Setting taglineEn) seeded for all sample data.
+- **Admin is also bilingual** (PT/EN, same toggle in the sidebar + mobile bar +
+  login screen, shared `mundo_lang`). All admin UI chrome/labels/buttons/status
+  labels go through `t()`; the "Mundo · Admin" brand and stored DB values
+  (product names, customer notes, business names) stay in their source language.
+  Outbound WhatsApp messages to customers stay PT (customers are Brazilian).
 - User-generated review text stays in its original language (by design).
 
 ## Current status / next up

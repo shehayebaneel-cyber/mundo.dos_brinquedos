@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import type { Banner, Category, Settings } from "../../lib/types";
+import { useI18n } from "../../lib/i18n";
 
 const input = "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand";
 const lbl = "mb-1 block text-xs font-bold text-muted";
 const BG = ["brand", "grape", "mint", "sun", "sky"];
 
 export function AdminContent() {
+  const { t } = useI18n();
   const [tab, setTab] = useState<"loja" | "banners" | "categorias">("loja");
   return (
     <div>
-      <h1 className="mb-3 font-display text-2xl font-extrabold text-ink">Conteúdo & Loja</h1>
+      <h1 className="mb-3 font-display text-2xl font-extrabold text-ink">{t("Conteúdo & Loja")}</h1>
       <div className="mb-4 flex gap-2">
         {([["loja", "🏬 Informações"], ["banners", "🖼️ Banners"], ["categorias", "🗂️ Categorias"]] as const).map(([k, l]) => (
-          <button key={k} onClick={() => setTab(k)} className={`rounded-full px-4 py-1.5 text-sm font-bold ${tab === k ? "bg-brand text-white" : "bg-surface border border-line text-ink"}`}>{l}</button>
+          <button key={k} onClick={() => setTab(k)} className={`rounded-full px-4 py-1.5 text-sm font-bold ${tab === k ? "bg-brand text-white" : "bg-surface border border-line text-ink"}`}>{t(l)}</button>
         ))}
       </div>
       {tab === "loja" && <StoreSettings />}
@@ -24,10 +26,11 @@ export function AdminContent() {
 }
 
 function StoreSettings() {
+  const { t } = useI18n();
   const [s, setS] = useState<Settings | null>(null);
   const [saved, setSaved] = useState(false);
   useEffect(() => { api.aGet<Settings>("/api/admin/settings").then(setS); }, []);
-  if (!s) return <p className="text-muted">Carregando…</p>;
+  if (!s) return <p className="text-muted">{t("Carregando…")}</p>;
   const set = (k: string, v: string) => setS((c) => ({ ...c!, [k]: v }));
   const fields: [string, string][] = [
     ["storeName", "Nome da loja"], ["tagline", "Slogan"], ["whatsappLabel", "WhatsApp (exibido)"], ["whatsapp", "WhatsApp (só números, com 55)"],
@@ -39,17 +42,18 @@ function StoreSettings() {
     <div className="max-w-2xl rounded-[16px] border border-line bg-surface p-4">
       <div className="grid gap-3 sm:grid-cols-2">
         {fields.map(([k, label]) => (
-          <div key={k} className={k === "address" || k === "mapsUrl" ? "sm:col-span-2" : ""}><label className={lbl}>{label}</label><input value={s[k] ?? ""} onChange={(e) => set(k, e.target.value)} className={input} /></div>
+          <div key={k} className={k === "address" || k === "mapsUrl" ? "sm:col-span-2" : ""}><label className={lbl}>{t(label)}</label><input value={s[k] ?? ""} onChange={(e) => set(k, e.target.value)} className={input} /></div>
         ))}
-        <div><label className={lbl}>Pedido mínimo atacado (centavos)</label><input value={s.wholesaleMinOrderCents ?? ""} onChange={(e) => set("wholesaleMinOrderCents", e.target.value)} className={input} /></div>
-        <div><label className={lbl}>Frete grátis acima de (centavos)</label><input value={s.freeShippingMinCents ?? ""} onChange={(e) => set("freeShippingMinCents", e.target.value)} className={input} /></div>
+        <div><label className={lbl}>{t("Pedido mínimo atacado (centavos)")}</label><input value={s.wholesaleMinOrderCents ?? ""} onChange={(e) => set("wholesaleMinOrderCents", e.target.value)} className={input} /></div>
+        <div><label className={lbl}>{t("Frete grátis acima de (centavos)")}</label><input value={s.freeShippingMinCents ?? ""} onChange={(e) => set("freeShippingMinCents", e.target.value)} className={input} /></div>
       </div>
-      <button onClick={save} className="btn btn-primary mt-4 px-6 py-2.5">{saved ? "✓ Salvo!" : "Salvar informações"}</button>
+      <button onClick={save} className="btn btn-primary mt-4 px-6 py-2.5">{saved ? t("✓ Salvo!") : t("Salvar informações")}</button>
     </div>
   );
 }
 
 function Banners() {
+  const { t } = useI18n();
   const [list, setList] = useState<Banner[] | null>(null);
   const load = () => api.aGet<Banner[]>("/api/admin/banners").then(setList);
   useEffect(() => { load(); }, []);
@@ -60,9 +64,9 @@ function Banners() {
     else await api.aPost("/api/admin/banners", b);
     load();
   }
-  async function del(id: number) { if (confirm("Excluir banner?")) { await api.aDel(`/api/admin/banners/${id}`); load(); } }
+  async function del(id: number) { if (confirm(t("Excluir banner?"))) { await api.aDel(`/api/admin/banners/${id}`); load(); } }
 
-  if (!list) return <p className="text-muted">Carregando…</p>;
+  if (!list) return <p className="text-muted">{t("Carregando…")}</p>;
   return (
     <div className="space-y-3">
       {list.map((b) => <BannerRow key={b.id} b={b} onSave={save} onDel={() => del(b.id)} />)}
@@ -72,35 +76,37 @@ function Banners() {
 }
 
 function BannerRow({ b, isNew, onSave, onDel }: { b: Banner; isNew?: boolean; onSave: (b: Partial<Banner>) => void; onDel?: () => void }) {
+  const { t } = useI18n();
   const [f, setF] = useState(b);
   const set = (k: string, v: string | boolean | number) => setF((c) => ({ ...c, [k]: v }));
   return (
     <div className={`rounded-[16px] border p-4 ${isNew ? "border-dashed border-brand" : "border-line"} bg-surface`}>
-      {isNew && <p className="mb-2 text-sm font-bold text-brand-dark">+ Novo banner</p>}
+      {isNew && <p className="mb-2 text-sm font-bold text-brand-dark">{t("+ Novo banner")}</p>}
       <div className="grid gap-2 sm:grid-cols-2">
-        <input value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="Título" className={input} />
-        <input value={f.subtitle} onChange={(e) => set("subtitle", e.target.value)} placeholder="Subtítulo" className={input} />
-        <input value={f.badge} onChange={(e) => set("badge", e.target.value)} placeholder="Selo (ex.: 💠 Pix)" className={input} />
+        <input value={f.title} onChange={(e) => set("title", e.target.value)} placeholder={t("Título")} className={input} />
+        <input value={f.subtitle} onChange={(e) => set("subtitle", e.target.value)} placeholder={t("Subtítulo")} className={input} />
+        <input value={f.badge} onChange={(e) => set("badge", e.target.value)} placeholder={t("Selo (ex.: 💠 Pix)")} className={input} />
         <div className="flex gap-2">
           <input value={f.emoji} onChange={(e) => set("emoji", e.target.value)} placeholder="🧸" className={`${input} w-16`} />
           <select value={f.bg} onChange={(e) => set("bg", e.target.value)} className={input}>{BG.map((g) => <option key={g}>{g}</option>)}</select>
         </div>
-        <input value={f.ctaLabel} onChange={(e) => set("ctaLabel", e.target.value)} placeholder="Botão 1 (texto)" className={input} />
-        <input value={f.ctaHref} onChange={(e) => set("ctaHref", e.target.value)} placeholder="Botão 1 (link /produtos)" className={input} />
-        <input value={f.cta2Label} onChange={(e) => set("cta2Label", e.target.value)} placeholder="Botão 2 (texto)" className={input} />
-        <input value={f.cta2Href} onChange={(e) => set("cta2Href", e.target.value)} placeholder="Botão 2 (link)" className={input} />
+        <input value={f.ctaLabel} onChange={(e) => set("ctaLabel", e.target.value)} placeholder={t("Botão 1 (texto)")} className={input} />
+        <input value={f.ctaHref} onChange={(e) => set("ctaHref", e.target.value)} placeholder={t("Botão 1 (link /produtos)")} className={input} />
+        <input value={f.cta2Label} onChange={(e) => set("cta2Label", e.target.value)} placeholder={t("Botão 2 (texto)")} className={input} />
+        <input value={f.cta2Href} onChange={(e) => set("cta2Href", e.target.value)} placeholder={t("Botão 2 (link)")} className={input} />
       </div>
       <div className="mt-2 flex items-center gap-3">
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.active} onChange={(e) => set("active", e.target.checked)} className="accent-brand" /> Ativo</label>
-        <input type="number" value={f.sortOrder} onChange={(e) => set("sortOrder", Number(e.target.value))} className={`${input} w-20`} title="ordem" />
-        <button onClick={() => onSave(f)} className="btn btn-primary ml-auto px-4 py-1.5 text-sm">{isNew ? "Adicionar" : "Salvar"}</button>
-        {onDel && <button onClick={onDel} className="btn btn-ghost px-4 py-1.5 text-sm text-danger">Excluir</button>}
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.active} onChange={(e) => set("active", e.target.checked)} className="accent-brand" /> {t("Ativo")}</label>
+        <input type="number" value={f.sortOrder} onChange={(e) => set("sortOrder", Number(e.target.value))} className={`${input} w-20`} title={t("ordem")} />
+        <button onClick={() => onSave(f)} className="btn btn-primary ml-auto px-4 py-1.5 text-sm">{isNew ? t("Adicionar") : t("Salvar")}</button>
+        {onDel && <button onClick={onDel} className="btn btn-ghost px-4 py-1.5 text-sm text-danger">{t("Excluir")}</button>}
       </div>
     </div>
   );
 }
 
 function Categories() {
+  const { t } = useI18n();
   const [list, setList] = useState<(Category & { _count?: { products: number } })[] | null>(null);
   const load = () => api.aGet<Category[]>("/api/admin/categories").then(setList);
   useEffect(() => { load(); }, []);
@@ -112,24 +118,24 @@ function Categories() {
     setNw({ name: "", slug: "", emoji: "🧸", accent: "brand" });
     load();
   }
-  async function del(id: number) { if (confirm("Excluir categoria?")) { await api.aDel(`/api/admin/categories/${id}`); load(); } }
+  async function del(id: number) { if (confirm(t("Excluir categoria?"))) { await api.aDel(`/api/admin/categories/${id}`); load(); } }
   async function upd(id: number, data: Partial<Category>) { await api.aPatch(`/api/admin/categories/${id}`, data); load(); }
 
-  if (!list) return <p className="text-muted">Carregando…</p>;
+  if (!list) return <p className="text-muted">{t("Carregando…")}</p>;
   return (
     <div className="max-w-2xl space-y-2">
       {list.map((c) => (
         <div key={c.id} className="flex items-center gap-2 rounded-[16px] border border-line bg-surface p-3">
           <input defaultValue={c.emoji} onBlur={(e) => e.target.value !== c.emoji && upd(c.id, { emoji: e.target.value })} className={`${input} w-14 text-center`} />
           <input defaultValue={c.name} onBlur={(e) => e.target.value !== c.name && upd(c.id, { name: e.target.value })} className={input} />
-          <span className="whitespace-nowrap text-xs text-muted">{c._count?.products ?? 0} prod.</span>
-          <label className="flex items-center gap-1 text-xs"><input type="checkbox" defaultChecked={c.active} onChange={(e) => upd(c.id, { active: e.target.checked })} className="accent-brand" />ativa</label>
+          <span className="whitespace-nowrap text-xs text-muted">{t("{n} prod.", { n: c._count?.products ?? 0 })}</span>
+          <label className="flex items-center gap-1 text-xs"><input type="checkbox" defaultChecked={c.active} onChange={(e) => upd(c.id, { active: e.target.checked })} className="accent-brand" />{t("ativa")}</label>
           <button onClick={() => del(c.id)} className="px-2 text-danger">✕</button>
         </div>
       ))}
       <div className="flex items-center gap-2 rounded-[16px] border border-dashed border-brand bg-surface p-3">
         <input value={nw.emoji} onChange={(e) => setNw({ ...nw, emoji: e.target.value })} className={`${input} w-14 text-center`} />
-        <input value={nw.name} onChange={(e) => setNw({ ...nw, name: e.target.value })} placeholder="Nova categoria" className={input} />
+        <input value={nw.name} onChange={(e) => setNw({ ...nw, name: e.target.value })} placeholder={t("Nova categoria")} className={input} />
         <button onClick={add} className="btn btn-primary px-4 py-1.5 text-sm">+ Add</button>
       </div>
     </div>

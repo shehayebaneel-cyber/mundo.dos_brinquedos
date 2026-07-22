@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../../lib/api";
 import type { Category, Product } from "../../lib/types";
+import { useI18n } from "../../lib/i18n";
 
 type ImgRow = { url: string; alt: string };
 type VarRow = { kind: string; label: string; swatch: string; stock: number; priceDeltaReais: number };
@@ -10,6 +11,7 @@ const reais = (cents: number | null | undefined) => (cents == null ? "" : (cents
 const cents = (v: string | number) => Math.round(Number(v || 0) * 100);
 
 export function AdminProductEdit() {
+  const { t } = useI18n();
   const { id } = useParams();
   const isNew = id === "novo" || !id;
   const nav = useNavigate();
@@ -48,7 +50,7 @@ export function AdminProductEdit() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setErr("");
-    if (!f.name || !f.price) { setErr("Nome e preço são obrigatórios."); return; }
+    if (!f.name || !f.price) { setErr(t("Nome e preço são obrigatórios.")); return; }
     setBusy(true);
     const payload = {
       slug: f.slug || f.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
@@ -67,7 +69,7 @@ export function AdminProductEdit() {
       else await api.aPatch(`/api/admin/products/${id}`, payload);
       nav("/admin/produtos");
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Erro ao salvar.");
+      setErr(e instanceof Error ? e.message : t("Erro ao salvar."));
     } finally {
       setBusy(false);
     }
@@ -83,107 +85,107 @@ export function AdminProductEdit() {
     <form onSubmit={save} className="mx-auto max-w-3xl">
       <div className="mb-4 flex items-center gap-2">
         <button type="button" onClick={() => nav("/admin/produtos")} className="text-muted">←</button>
-        <h1 className="font-display text-2xl font-extrabold text-ink">{isNew ? "Novo produto" : "Editar produto"}</h1>
+        <h1 className="font-display text-2xl font-extrabold text-ink">{isNew ? t("Novo produto") : t("Editar produto")}</h1>
       </div>
 
       <div className="space-y-4">
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-3 font-display font-bold text-ink">Informações básicas</h2>
+          <h2 className="mb-3 font-display font-bold text-ink">{t("Informações básicas")}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="sm:col-span-2">{F({ k: "name", label: "Nome *" })}</div>
-            <F k="brand" label="Marca" />
-            <F k="sku" label="SKU / código" />
+            <div className="sm:col-span-2">{F({ k: "name", label: t("Nome *") })}</div>
+            <F k="brand" label={t("Marca")} />
+            <F k="sku" label={t("SKU / código")} />
             <div>
-              <label className={lbl}>Categoria</label>
+              <label className={lbl}>{t("Categoria")}</label>
               <select value={f.categoryId} onChange={(e) => set("categoryId", e.target.value)} className={input}>
-                <option value="">Sem categoria</option>
+                <option value="">{t("Sem categoria")}</option>
                 {cats.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
               </select>
             </div>
-            <F k="slug" label="URL (slug)" ph="gerado do nome" />
-            <div className="sm:col-span-2"><label className={lbl}>Descrição</label><textarea value={f.description} onChange={(e) => set("description", e.target.value)} rows={4} className={input} /></div>
+            <F k="slug" label={t("URL (slug)")} ph={t("gerado do nome")} />
+            <div className="sm:col-span-2"><label className={lbl}>{t("Descrição")}</label><textarea value={f.description} onChange={(e) => set("description", e.target.value)} rows={4} className={input} /></div>
           </div>
         </section>
 
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-3 font-display font-bold text-ink">Preços (R$)</h2>
+          <h2 className="mb-3 font-display font-bold text-ink">{t("Preços (R$)")}</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <F k="price" label="Preço de venda *" type="number" />
-            <F k="old" label="Preço antigo (de/por)" type="number" />
-            <F k="cost" label="Custo" type="number" />
-            <F k="wholesale" label="Preço atacado" type="number" />
-            <F k="pixPercent" label="Desconto Pix (%)" type="number" />
-            <F k="installmentsMax" label="Parcelas máx." type="number" />
+            <F k="price" label={t("Preço de venda *")} type="number" />
+            <F k="old" label={t("Preço antigo (de/por)")} type="number" />
+            <F k="cost" label={t("Custo")} type="number" />
+            <F k="wholesale" label={t("Preço atacado")} type="number" />
+            <F k="pixPercent" label={t("Desconto Pix (%)")} type="number" />
+            <F k="installmentsMax" label={t("Parcelas máx.")} type="number" />
           </div>
         </section>
 
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-3 font-display font-bold text-ink">Estoque & atacado</h2>
+          <h2 className="mb-3 font-display font-bold text-ink">{t("Estoque & atacado")}</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <F k="stock" label="Quantidade em estoque" type="number" />
-            <F k="lowStockAt" label="Alerta estoque baixo" type="number" />
-            <F k="minWholesaleQty" label="Qtd. mínima atacado" type="number" />
-            <F k="packQty" label="Unidades por caixa" type="number" />
-            <F k="weightGrams" label="Peso (gramas)" type="number" />
+            <F k="stock" label={t("Quantidade em estoque")} type="number" />
+            <F k="lowStockAt" label={t("Alerta estoque baixo")} type="number" />
+            <F k="minWholesaleQty" label={t("Qtd. mínima atacado")} type="number" />
+            <F k="packQty" label={t("Unidades por caixa")} type="number" />
+            <F k="weightGrams" label={t("Peso (gramas)")} type="number" />
           </div>
         </section>
 
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-3 font-display font-bold text-ink">Ficha técnica</h2>
+          <h2 className="mb-3 font-display font-bold text-ink">{t("Ficha técnica")}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <F k="ageGroup" label="Idade recomendada" ph="3+" />
-            <F k="material" label="Material" />
-            <F k="warranty" label="Garantia" />
+            <F k="ageGroup" label={t("Idade recomendada")} ph="3+" />
+            <F k="material" label={t("Material")} />
+            <F k="warranty" label={t("Garantia")} />
           </div>
         </section>
 
         {/* IMAGES */}
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-1 font-display font-bold text-ink">Imagens</h2>
-          <p className="mb-3 text-xs text-muted">No protótipo use <code className="rounded bg-surface-2 px-1">emoji|#cor</code> (ex.: <code className="rounded bg-surface-2 px-1">🚗|#e6f2ff</code>). Depois cole a URL da foto real.</p>
+          <h2 className="mb-1 font-display font-bold text-ink">{t("Imagens")}</h2>
+          <p className="mb-3 text-xs text-muted">{t("No protótipo use")} <code className="rounded bg-surface-2 px-1">emoji|#cor</code> {t("(ex.:")} <code className="rounded bg-surface-2 px-1">🚗|#e6f2ff</code>{t("). Depois cole a URL da foto real.")}</p>
           <div className="space-y-2">
             {images.map((im, i) => (
               <div key={i} className="flex gap-2">
-                <input value={im.url} onChange={(e) => setImages((cur) => cur.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)))} placeholder="🧸|#fff0f2 ou https://…" className={input} />
-                <input value={im.alt} onChange={(e) => setImages((cur) => cur.map((x, j) => (j === i ? { ...x, alt: e.target.value } : x)))} placeholder="descrição" className={`${input} max-w-[40%]`} />
+                <input value={im.url} onChange={(e) => setImages((cur) => cur.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)))} placeholder={t("🧸|#fff0f2 ou https://…")} className={input} />
+                <input value={im.alt} onChange={(e) => setImages((cur) => cur.map((x, j) => (j === i ? { ...x, alt: e.target.value } : x)))} placeholder={t("descrição")} className={`${input} max-w-[40%]`} />
                 <button type="button" onClick={() => setImages((cur) => cur.filter((_, j) => j !== i))} className="px-2 text-danger">✕</button>
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setImages((cur) => [...cur, { url: "", alt: "" }])} className="btn btn-ghost mt-2 px-3 py-1.5 text-sm">+ Adicionar imagem</button>
+          <button type="button" onClick={() => setImages((cur) => [...cur, { url: "", alt: "" }])} className="btn btn-ghost mt-2 px-3 py-1.5 text-sm">{t("+ Adicionar imagem")}</button>
         </section>
 
         {/* VARIANTS */}
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-3 font-display font-bold text-ink">Variações (cor / tamanho)</h2>
+          <h2 className="mb-3 font-display font-bold text-ink">{t("Variações (cor / tamanho)")}</h2>
           <div className="space-y-2">
             {variants.map((v, i) => (
               <div key={i} className="grid grid-cols-[1fr_1fr_auto_1fr_auto] items-center gap-2">
-                <select value={v.kind} onChange={(e) => setVariants((c) => c.map((x, j) => (j === i ? { ...x, kind: e.target.value } : x)))} className={input}><option value="cor">cor</option><option value="tamanho">tamanho</option></select>
-                <input value={v.label} onChange={(e) => setVariants((c) => c.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} placeholder="Rosa / Aro 16" className={input} />
+                <select value={v.kind} onChange={(e) => setVariants((c) => c.map((x, j) => (j === i ? { ...x, kind: e.target.value } : x)))} className={input}><option value="cor">{t("cor")}</option><option value="tamanho">{t("tamanho")}</option></select>
+                <input value={v.label} onChange={(e) => setVariants((c) => c.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} placeholder={t("Rosa / Aro 16")} className={input} />
                 <input type="color" value={v.swatch || "#ffffff"} onChange={(e) => setVariants((c) => c.map((x, j) => (j === i ? { ...x, swatch: e.target.value } : x)))} className="h-9 w-9 rounded border border-line" />
-                <input type="number" value={v.stock} onChange={(e) => setVariants((c) => c.map((x, j) => (j === i ? { ...x, stock: Number(e.target.value) } : x)))} placeholder="estoque" className={input} />
+                <input type="number" value={v.stock} onChange={(e) => setVariants((c) => c.map((x, j) => (j === i ? { ...x, stock: Number(e.target.value) } : x)))} placeholder={t("estoque")} className={input} />
                 <button type="button" onClick={() => setVariants((c) => c.filter((_, j) => j !== i))} className="px-2 text-danger">✕</button>
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setVariants((c) => [...c, { kind: "cor", label: "", swatch: "#ff7ba8", stock: 0, priceDeltaReais: 0 }])} className="btn btn-ghost mt-2 px-3 py-1.5 text-sm">+ Adicionar variação</button>
+          <button type="button" onClick={() => setVariants((c) => [...c, { kind: "cor", label: "", swatch: "#ff7ba8", stock: 0, priceDeltaReais: 0 }])} className="btn btn-ghost mt-2 px-3 py-1.5 text-sm">{t("+ Adicionar variação")}</button>
         </section>
 
         {/* FLAGS */}
         <section className="rounded-[16px] border border-line bg-surface p-4">
-          <h2 className="mb-3 font-display font-bold text-ink">Marcadores</h2>
+          <h2 className="mb-3 font-display font-bold text-ink">{t("Marcadores")}</h2>
           <div className="flex flex-wrap gap-4 text-sm">
             {([["featured", "Destaque"], ["isNew", "Novidade"], ["bestSeller", "Mais vendido"], ["wholesaleOnly", "Só atacado"], ["active", "Visível na loja"]] as const).map(([k, label]) => (
-              <label key={k} className="flex items-center gap-2"><input type="checkbox" checked={f[k] as boolean} onChange={(e) => set(k, e.target.checked)} className="accent-brand" /> {label}</label>
+              <label key={k} className="flex items-center gap-2"><input type="checkbox" checked={f[k] as boolean} onChange={(e) => set(k, e.target.checked)} className="accent-brand" /> {t(label)}</label>
             ))}
           </div>
         </section>
 
         {err && <p className="text-sm font-semibold text-danger">{err}</p>}
         <div className="sticky bottom-0 flex gap-2 border-t border-line bg-cream py-3">
-          <button disabled={busy} className="btn btn-primary flex-1 py-3 disabled:opacity-60">{busy ? "Salvando…" : "Salvar produto"}</button>
-          <button type="button" onClick={() => nav("/admin/produtos")} className="btn btn-ghost px-5 py-3">Cancelar</button>
+          <button disabled={busy} className="btn btn-primary flex-1 py-3 disabled:opacity-60">{busy ? t("Salvando…") : t("Salvar produto")}</button>
+          <button type="button" onClick={() => nav("/admin/produtos")} className="btn btn-ghost px-5 py-3">{t("Cancelar")}</button>
         </div>
       </div>
     </form>
