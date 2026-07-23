@@ -106,6 +106,11 @@ export function AdminProducts() {
     const a = document.createElement("a"); a.href = url; a.download = "produtos.csv"; a.click(); URL.revokeObjectURL(url);
   }
 
+  async function quickSave(id: number, patch: Record<string, unknown>) {
+    const updated = await api.aPatch<Product>(`/api/admin/products/${id}/quick`, patch);
+    setData((d) => (d ? { ...d, items: d.items.map((p) => (p.id === id ? updated : p)) } : d));
+  }
+
   const total = data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / pageSize));
   const activeFilters = (["category", "subcat", "brand", "status", "stock", "flag", "tier", "missing", "priceMin", "priceMax"] as const).filter((k) => sp.get(k));
@@ -177,13 +182,22 @@ export function AdminProducts() {
                       <div className="min-w-0"><div className="truncate font-semibold text-ink max-w-[220px]">{p.name}</div><div className="text-xs text-muted">{p.sku || t("sem código")}</div></div>
                     </div>
                   </td>
-                  <td className="p-3 text-xs text-muted">{p.category?.name ?? "—"}{p.subcat ? <div className="text-[10px]">{p.subcat}</div> : null}</td>
-                  <td className="p-3 font-bold tabular">{brl(p.priceCents)}</td>
-                  <td className="p-3 text-xs tabular text-teal-dark">{p.price10Cents != null ? brl(p.price10Cents) : "—"}</td>
-                  <td className="p-3 text-xs tabular text-grape">{p.wholesaleCents != null ? brl(p.wholesaleCents) : "—"}</td>
-                  <td className="p-3"><span className={`font-bold ${out ? "text-danger" : low ? "text-warn" : "text-pix"}`}>{p.stock}</span></td>
+                  <td className="p-3 text-xs">
+                    <select value={p.categoryId ?? ""} onChange={(e) => quickSave(p.id, { categoryId: e.target.value })} className="max-w-[130px] rounded border border-line bg-surface px-1 py-0.5 text-xs">
+                      <option value="">—</option>
+                      {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                    {p.subcat ? <div className="mt-0.5 text-[10px] text-muted">{p.subcat}</div> : null}
+                  </td>
+                  <td className="p-3"><NumCell value={p.priceCents} cents onSave={(v) => quickSave(p.id, { priceCents: v ?? 0 })} className="font-bold text-ink" /></td>
+                  <td className="p-3"><NumCell value={p.price10Cents} cents nullable onSave={(v) => quickSave(p.id, { price10Cents: v })} className="text-teal-dark" /></td>
+                  <td className="p-3"><NumCell value={p.wholesaleCents} cents nullable onSave={(v) => quickSave(p.id, { wholesaleCents: v })} className="text-grape" /></td>
+                  <td className="p-3"><NumCell value={p.stock} onSave={(v) => quickSave(p.id, { stock: v ?? 0 })} className={`font-bold ${out ? "text-danger" : low ? "text-warn" : "text-pix"}`} /></td>
                   <td className="p-3"><div className="flex flex-wrap gap-1">
-                    {p.featured && <Tag>{t("destaque")}</Tag>}{p.isNew && <Tag>{t("novo")}</Tag>}{p.bestSeller && <Tag>{t("top")}</Tag>}{!p.active && <Tag tone="bg-danger/10 text-danger">{t("oculto")}</Tag>}
+                    <FlagChip on={p.isNew} label={t("novo")} onClick={() => quickSave(p.id, { isNew: !p.isNew })} />
+                    <FlagChip on={p.featured} label={t("destaque")} onClick={() => quickSave(p.id, { featured: !p.featured })} />
+                    <FlagChip on={p.bestSeller} label={t("top")} onClick={() => quickSave(p.id, { bestSeller: !p.bestSeller })} />
+                    <FlagChip on={!p.active} label={t("oculto")} danger onClick={() => quickSave(p.id, { active: !p.active })} />
                   </div></td>
                   <td className="p-3 whitespace-nowrap text-xs text-muted">{new Date(p.updatedAt).toLocaleDateString(t("pt-BR"))}</td>
                   <td className="p-3"><div className="flex justify-end gap-1">
@@ -233,8 +247,24 @@ function pageList(cur: number, total: number): (number | "…")[] {
   }
   return out;
 }
-function Tag({ children, tone = "bg-surface-2 text-muted" }: { children: React.ReactNode; tone?: string }) {
-  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${tone}`}>{children}</span>;
+function NumCell({ value, cents, nullable, onSave, className = "" }: { value: number | null; cents?: boolean; nullable?: boolean; onSave: (v: number | null) => void; className?: string }) {
+  const [editing, setEditing] = useState(false);
+  const [v, setV] = useState("");
+  const disp = value == null ? "—" : cents ? brl(value) : String(value);
+  if (editing) {
+    const commit = () => {
+      setEditing(false);
+      const raw = v.trim();
+      if (raw === "" && value == null) return;
+      const parsed = raw === "" ? (nullable ? null : 0) : cents ? Math.round(Number(raw.replace(",", ".")) * 100) : Math.round(Number(raw));
+      if (parsed !== value) onSave(parsed);
+    };
+    return <input autoFocus type="number" step={cents ? "0.01" : "1"} value={v} onChange={(e) => setV(e.target.value)} onBlur={commit} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); if (e.key === "Escape") setEditing(false); }} className="w-20 rounded border border-brand px-1 py-0.5 text-sm tabular outline-none" />;
+  }
+  return <button onClick={() => { setV(value == null ? "" : cents ? (value / 100).toFixed(2) : String(value)); setEditing(true); }} className={`rounded px-1 tabular hover:bg-brand-soft/60 ${className}`} title="Editar">{disp}</button>;
+}
+function FlagChip({ on, label, danger, onClick }: { on: boolean; label: string; danger?: boolean; onClick: () => void }) {
+  return <button onClick={onClick} className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition-colors ${on ? (danger ? "bg-danger/10 text-danger" : "bg-brand text-white") : "bg-surface-2 text-muted hover:bg-surface-2/60 hover:text-ink"}`}>{label}</button>;
 }
 
 type BulkCat = { id: number; slug: string; name: string; emoji: string };

@@ -326,6 +326,27 @@ app.post("/api/admin/products", asyncH(async (req, res) => {
   });
   res.status(201).json(p);
 }));
+// Partial "quick edit" from the list — only updates the fields provided (never wipes others)
+app.patch("/api/admin/products/:id/quick", asyncH(async (req, res) => {
+  const b = req.body ?? {};
+  const data: Record<string, unknown> = {};
+  const nn = (v: unknown) => (v === null || v === "" ? null : num(v));
+  if (b.stock !== undefined) data.stock = num(b.stock);
+  if (b.lowStockAt !== undefined) data.lowStockAt = num(b.lowStockAt);
+  if (b.priceCents !== undefined) data.priceCents = num(b.priceCents);
+  if (b.price10Cents !== undefined) data.price10Cents = nn(b.price10Cents);
+  if (b.wholesaleCents !== undefined) data.wholesaleCents = nn(b.wholesaleCents);
+  if (b.oldPriceCents !== undefined) data.oldPriceCents = nn(b.oldPriceCents);
+  if (b.active !== undefined) data.active = bool(b.active);
+  if (b.featured !== undefined) data.featured = bool(b.featured);
+  if (b.isNew !== undefined) data.isNew = bool(b.isNew);
+  if (b.bestSeller !== undefined) data.bestSeller = bool(b.bestSeller);
+  if (b.categoryId !== undefined) data.categoryId = b.categoryId ? num(b.categoryId) : null;
+  if (b.subcat !== undefined) data.subcat = str(b.subcat);
+  if (!Object.keys(data).length) return res.json({ ok: true });
+  const p = await db.product.update({ where: { id: num(req.params.id) }, data, include: withMedia });
+  res.json(p);
+}));
 app.patch("/api/admin/products/:id", asyncH(async (req, res) => {
   const id = num(req.params.id);
   const b = req.body ?? {};
