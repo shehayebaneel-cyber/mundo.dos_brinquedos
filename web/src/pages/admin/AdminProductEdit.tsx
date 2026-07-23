@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../../lib/api";
 import type { Category, Product } from "../../lib/types";
 import { useI18n } from "../../lib/i18n";
@@ -18,6 +18,7 @@ export function AdminProductEdit() {
   const [cats, setCats] = useState<Category[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [dupWarn, setDupWarn] = useState<{ id: number; name: string; sku: string }[]>([]);
 
   const [f, setF] = useState({
     slug: "", name: "", brand: "", sku: "", description: "", categoryId: "",
@@ -44,6 +45,17 @@ export function AdminProductEdit() {
       setVariants(p.variants.map((v) => ({ kind: v.kind, label: v.label, swatch: v.swatch, stock: v.stock, priceDeltaReais: v.priceDeltaCents / 100 })));
     });
   }, [id]);
+
+  // duplicate-prevention: warn if a product with the same name / code already exists
+  useEffect(() => {
+    if (!f.name.trim() && !f.sku.trim()) { setDupWarn([]); return; }
+    const id = setTimeout(() => {
+      const p = new URLSearchParams({ name: f.name.trim(), sku: f.sku.trim() });
+      if (!isNew) p.set("excludeId", String(id ?? ""));
+      api.aGet<{ matches: { id: number; name: string; sku: string }[] }>(`/api/admin/products/check?${p}`).then((r) => setDupWarn(r.matches)).catch(() => {});
+    }, 400);
+    return () => clearTimeout(id);
+  }, [f.name, f.sku]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = (k: string, v: string | boolean) => setF((cur) => ({ ...cur, [k]: v }));
 
@@ -88,6 +100,18 @@ export function AdminProductEdit() {
         <button type="button" onClick={() => nav("/admin/produtos")} className="text-muted">←</button>
         <h1 className="font-display text-2xl font-extrabold text-ink">{isNew ? t("Novo produto") : t("Editar produto")}</h1>
       </div>
+
+      {dupWarn.length > 0 && (
+        <div className="mb-4 rounded-xl border-2 border-warn/50 bg-warn/10 p-3 text-sm">
+          <p className="font-bold text-warn">⚠️ {t("Já existe produto parecido:")}</p>
+          <ul className="mt-1 space-y-0.5">
+            {dupWarn.map((d) => (
+              <li key={d.id}><Link to={`/admin/produtos/${d.id}`} className="font-semibold text-ink underline">{d.name}</Link> {d.sku && <span className="text-muted">· {d.sku}</span>}</li>
+            ))}
+          </ul>
+          <p className="mt-1 text-xs text-muted">{t("Verifique se não é um produto duplicado antes de salvar.")}</p>
+        </div>
+      )}
 
       <div className="space-y-4">
         <section className="rounded-[16px] border border-line bg-surface p-4">

@@ -248,8 +248,63 @@ function productData(b: Record<string, unknown>) {
   };
 }
 
-app.get("/api/admin/products", asyncH(async (_req, res) => {
-  res.json(await db.product.findMany({ include: withMedia, orderBy: { createdAt: "desc" } }));
+app.get("/api/admin/products", asyncH(async (req, res) => {
+  const q = req.query as Record<string, string>;
+  const page = Math.max(1, num(q.page, 1));
+  const pageSize = Math.min(200, Math.max(1, num(q.pageSize, 24)));
+  const term = str(q.q).trim();
+  const mode = "insensitive" as const;
+  const where: Record<string, unknown> = {};
+  const AND: Record<string, unknown>[] = [];
+  if (term) AND.push({ OR: [
+    { name: { contains: term, mode } }, { sku: { contains: term, mode } }, { subcat: { contains: term, mode } },
+    { brand: { contains: term, mode } }, { description: { contains: term, mode } }, { category: { name: { contains: term, mode } } },
+  ] });
+  if (q.category) AND.push({ category: { slug: q.category } });
+  if (q.subcat) AND.push({ subcat: q.subcat });
+  if (q.brand) AND.push({ brand: q.brand });
+  if (q.status === "active") AND.push({ active: true });
+  if (q.status === "hidden") AND.push({ active: false });
+  if (q.stock === "in") AND.push({ stock: { gt: 0 } });
+  if (q.stock === "out") AND.push({ stock: { lte: 0 } });
+  if (q.stock === "low") AND.push({ AND: [{ stock: { gt: 0 } }, { stock: { lte: 5 } }] });
+  if (q.flag === "new") AND.push({ isNew: true });
+  if (q.flag === "featured") AND.push({ featured: true });
+  if (q.flag === "best") AND.push({ bestSeller: true });
+  if (q.flag === "promo") AND.push({ oldPriceCents: { not: null } });
+  if (q.tier === "has10") AND.push({ price10Cents: { not: null } });
+  if (q.tier === "hasWholesale") AND.push({ wholesaleCents: { not: null } });
+  if (q.missing === "image") AND.push({ images: { none: {} } });
+  if (q.missing === "price") AND.push({ priceCents: { lte: 0 } });
+  if (q.missing === "category") AND.push({ categoryId: null });
+  if (q.missing === "sku") AND.push({ sku: "" });
+  if (q.priceMin) AND.push({ priceCents: { gte: num(q.priceMin) } });
+  if (q.priceMax) AND.push({ priceCents: { lte: num(q.priceMax) } });
+  if (AND.length) where.AND = AND;
+  const s = str(q.sort, "recent");
+  const orderBy =
+    s === "name" ? { name: "asc" as const } :
+    s === "price_asc" ? { priceCents: "asc" as const } : s === "price_desc" ? { priceCents: "desc" as const } :
+    s === "stock_asc" ? { stock: "asc" as const } : s === "stock_desc" ? { stock: "desc" as const } :
+    s === "oldest" ? { createdAt: "asc" as const } : s === "updated" ? { updatedAt: "desc" as const } :
+    s === "best" ? { bestSeller: "desc" as const } : { createdAt: "desc" as const };
+  const [items, total] = await Promise.all([
+    db.product.findMany({ where, include: withMedia, orderBy, skip: (page - 1) * pageSize, take: pageSize }),
+    db.product.count({ where }),
+  ]);
+  res.json({ items, total, page, pageSize });
+}));
+// Duplicate-prevention: warn when a product name / barcode / image already exists
+app.get("/api/admin/products/check", asyncH(async (req, res) => {
+  const q = req.query as Record<string, string>;
+  const name = str(q.name).trim(), sku = str(q.sku).trim(), image = str(q.image).trim();
+  const or: Record<string, unknown>[] = [];
+  if (name) or.push({ name: { equals: name, mode: "insensitive" } });
+  if (sku) or.push({ sku });
+  if (image) or.push({ images: { some: { url: image } } });
+  if (!or.length) return res.json({ matches: [] });
+  const matches = await db.product.findMany({ where: { OR: or, ...(q.excludeId ? { id: { not: num(q.excludeId) } } : {}) }, select: { id: true, name: true, sku: true }, take: 5 });
+  res.json({ matches });
 }));
 app.get("/api/admin/products/:id", asyncH(async (req, res) => {
   const p = await db.product.findUnique({ where: { id: num(req.params.id) }, include: withMedia });
