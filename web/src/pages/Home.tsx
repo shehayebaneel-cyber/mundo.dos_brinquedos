@@ -32,10 +32,9 @@ export function Home() {
       {/* ======================= HERO ======================= */}
       <section className="relative overflow-hidden bg-blue text-white">
         <span className="dots pointer-events-none absolute inset-0 text-white/15" aria-hidden />
-        <Star className="absolute left-[6%] top-8 h-8 w-8 text-yellow" />
-        <Star className="absolute right-[42%] top-6 h-5 w-5 text-white/70" />
-        <Squiggle className="absolute left-[30%] bottom-24 h-6 w-28 text-white/40" />
-        <BlobFace className="absolute -left-8 bottom-[-10px] h-28 w-28 text-teal opacity-90" />
+        <Star className="animate-floaty pointer-events-none absolute left-[6%] top-8 h-7 w-7 text-yellow" />
+        <Star className="animate-floaty-slow pointer-events-none absolute right-[7%] top-7 h-5 w-5 text-white/70" />
+        <Squiggle className="animate-floaty-fast pointer-events-none absolute left-[34%] bottom-24 hidden h-6 w-24 text-white/40 sm:block" />
         <div className="mx-auto grid max-w-6xl items-center gap-6 px-4 py-6 sm:py-8 lg:grid-cols-2">
           <div className="relative z-10">
             <span className="inline-flex items-center gap-2 rounded-full bg-yellow px-3 py-1 text-xs font-extrabold text-ink">🎉 {settings.tagline || "Varejo e atacado · entrega para todo o Brasil"}</span>
@@ -117,7 +116,8 @@ export function Home() {
             {/* ======================= OFFERS BAND ======================= */}
             <section className="relative overflow-hidden rounded-[30px] bg-orange p-6 text-white sm:p-8">
               <span className="dots pointer-events-none absolute inset-0 text-white/20" aria-hidden />
-              <Star className="absolute right-6 top-5 h-7 w-7 text-yellow" />
+              <Star className="animate-floaty pointer-events-none absolute right-6 top-5 h-7 w-7 text-yellow" />
+              <BlobFace className="animate-floaty-slow pointer-events-none absolute -left-3 -bottom-3 hidden h-16 w-16 text-brand opacity-90 sm:block" />
               <Squiggle className="absolute right-24 bottom-6 hidden h-6 w-28 text-white/40 sm:block" />
               <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <div className="flex-1">
@@ -146,7 +146,8 @@ export function Home() {
 
             {/* ======================= WHOLESALE ======================= */}
             <section className="relative overflow-hidden rounded-[30px] bg-grape p-6 text-white sm:p-9">
-              <BlobFace className="absolute -right-6 -bottom-8 h-40 w-40 text-blue opacity-80" />
+              <BlobFace className="animate-floaty-slow pointer-events-none absolute -right-6 -bottom-8 h-36 w-36 text-blue opacity-80" />
+              <Star className="animate-floaty pointer-events-none absolute right-8 top-6 hidden h-6 w-6 text-yellow sm:block" />
               <div className="relative max-w-lg">
                 <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-extrabold">📦 {t("Atacado")}</span>
                 <h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">{t("🧸📦 Compre no atacado")}</h2>

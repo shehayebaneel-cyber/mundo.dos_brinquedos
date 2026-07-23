@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../lib/cart";
 import { useWishlist } from "../lib/wishlist";
@@ -13,6 +14,14 @@ export function Header() {
   const nav = useNavigate();
   const [menu, setMenu] = useState(false);
   const [q, setQ] = useState("");
+
+  // lock the page behind the drawer from scrolling while it's open
+  useEffect(() => {
+    if (!menu) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [menu]);
 
   function search(e: React.FormEvent) {
     e.preventDefault();
@@ -75,31 +84,34 @@ export function Header() {
         <CatPill to="/rastrear" emoji="🚚" label={t("Rastrear pedido")} accent="sky" />
       </div>
 
-      {/* mobile drawer */}
-      {menu && (
-        <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMenu(false)}>
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute left-0 top-0 flex h-full w-80 max-w-[85%] flex-col bg-surface shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b-2 border-line p-4">
-              <img src="/logo.png" alt="" className="h-9 w-auto" />
-              <button onClick={() => setMenu(false)} className="grid h-9 w-9 place-items-center rounded-full bg-surface-2 text-lg" aria-label={t("Fechar")}>✕</button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-3">
-              <Link to="/produtos" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold hover:bg-surface-2">🛍️ {t("Todos os produtos")}</Link>
-              {categories.map((c) => (
-                <Link key={c.id} to={`/categoria/${c.slug}`} onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg" style={{ background: `color-mix(in srgb, var(--color-${c.accent}) 20%, white)` }}>{c.emoji}</span>
-                  {tf(c, "name")}
-                </Link>
-              ))}
-              <hr className="my-2 border-line" />
-              <Link to="/ofertas" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold text-brand-dark hover:bg-surface-2">🏷️ {t("Ofertas")}</Link>
-              <Link to="/atacado" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold hover:bg-surface-2">📦 {t("Atacado")}</Link>
-              <Link to="/conta" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">👤 {t("Minha conta")}</Link>
-              <Link to="/rastrear" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">🚚 {t("Rastrear pedido")}</Link>
+      {/* mobile drawer — portaled to <body> so it sits above the whole page */}
+      {createPortal(
+        menu ? (
+          <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true">
+            <div className="absolute inset-0 bg-black/50" onClick={() => setMenu(false)} aria-hidden />
+            <div className="absolute left-0 top-0 flex h-[100dvh] w-80 max-w-[86%] flex-col bg-surface shadow-2xl">
+              <div className="flex shrink-0 items-center justify-between border-b-2 border-line p-4">
+                <img src="/logo.png" alt="Mundo dos Brinquedos e Variedades" className="h-9 w-auto" />
+                <button onClick={() => setMenu(false)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2 text-lg" aria-label={t("Fechar")}>✕</button>
+              </div>
+              <nav className="flex-1 overflow-y-auto overscroll-contain p-3 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+                <Link to="/produtos" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold hover:bg-surface-2">🛍️ {t("Todos os produtos")}</Link>
+                {categories.map((c) => (
+                  <Link key={c.id} to={`/categoria/${c.slug}`} onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg" style={{ background: `color-mix(in srgb, var(--color-${c.accent}) 20%, white)` }}>{c.emoji}</span>
+                    {tf(c, "name")}
+                  </Link>
+                ))}
+                <hr className="my-2 border-line" />
+                <Link to="/ofertas" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold text-brand-dark hover:bg-surface-2">🏷️ {t("Ofertas")}</Link>
+                <Link to="/atacado" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold hover:bg-surface-2">📦 {t("Atacado")}</Link>
+                <Link to="/conta" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">👤 {t("Minha conta")}</Link>
+                <Link to="/rastrear" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">🚚 {t("Rastrear pedido")}</Link>
+              </nav>
             </div>
           </div>
-        </div>
+        ) : null,
+        document.body,
       )}
     </header>
   );

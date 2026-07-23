@@ -148,6 +148,15 @@
 }
 .animate-mascot-shadow { animation: mascot-shadow 2.6s ease-in-out infinite; }
 
+/* small floating decorations (toy-style characters) */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-10px) rotate(4deg); }
+}
+.animate-floaty { animation: floaty 4s ease-in-out infinite; }
+.animate-floaty-slow { animation: floaty 6.5s ease-in-out infinite; }
+.animate-floaty-fast { animation: floaty 3.2s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
