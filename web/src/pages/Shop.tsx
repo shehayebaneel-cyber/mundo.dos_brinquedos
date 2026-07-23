@@ -55,6 +55,8 @@ export function Shop({ mode }: { mode?: "ofertas" | "search" | "all" }) {
     bestSeller: flagParam === "mais-vendidos",
   }));
   const [drawer, setDrawer] = useState(false);
+  const PAGE = 24;
+  const [visible, setVisible] = useState(PAGE);
 
   const cat = categories.find((c) => c.slug === slug);
 
@@ -63,9 +65,12 @@ export function Shop({ mode }: { mode?: "ofertas" | "search" | "all" }) {
     const params = new URLSearchParams();
     if (slug) params.set("category", slug);
     if (q) params.set("q", q);
-    params.set("pageSize", "200");
+    params.set("pageSize", "5000"); // fetch the whole set; filters + count are client-side
     api.get<{ items: Product[] }>(`/api/products?${params}`).then((r) => setItems(r.items)).catch(() => setItems([]));
   }, [slug, q]);
+
+  // reset how many are shown whenever the result set changes
+  useEffect(() => { setVisible(PAGE); }, [slug, q, sort, f]);
 
   // facets derived from the fetched set
   const facets = useMemo(() => {
@@ -186,7 +191,17 @@ export function Shop({ mode }: { mode?: "ofertas" | "search" | "all" }) {
               {activeCount > 0 && <button onClick={() => setF(EMPTY)} className="btn btn-ghost mt-4 px-5 py-2.5 text-sm">{t("Limpar filtros")}</button>}
             </div>
           ) : (
-            <ProductGrid items={filtered} />
+            <>
+              <ProductGrid items={filtered.slice(0, visible)} />
+              {filtered.length > visible && (
+                <div className="mt-6 flex flex-col items-center gap-2">
+                  <button onClick={() => setVisible((v) => v + PAGE)} className="btn btn-primary px-8 py-3">
+                    {t("Ver mais produtos")} ({filtered.length - visible})
+                  </button>
+                  <span className="text-xs text-muted">{t("Mostrando {n} de {m}", { n: Math.min(visible, filtered.length), m: filtered.length })}</span>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
