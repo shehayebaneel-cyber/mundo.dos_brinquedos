@@ -16,6 +16,11 @@ export type CartLine = {
   regularCents: number;
   price10Cents: number | null;
   wholesaleCents: number | null;
+  // per-product full-box pricing
+  boxUnits: number; // units per full box (packQty)
+  boxPriceCents: number | null;
+  boxActive: boolean;
+  boxOnly: boolean;
 };
 
 type CartCtx = {
@@ -51,6 +56,10 @@ function normalize(raw: unknown): CartLine[] {
     regularCents: l.regularCents ?? l.priceCents ?? 0,
     price10Cents: l.price10Cents ?? null,
     wholesaleCents: l.wholesaleCents ?? null,
+    boxUnits: l.boxUnits ?? l.packQty ?? 0,
+    boxPriceCents: l.boxPriceCents ?? null,
+    boxActive: l.boxActive ?? false,
+    boxOnly: l.boxOnly ?? false,
   }));
 }
 
@@ -85,7 +94,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLines((cur) =>
         cur.map((l) => {
           const p = bySlug.get(l.slug);
-          return p ? { ...l, regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents, stock: p.stock } : l;
+          return p ? { ...l, regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents, stock: p.stock, boxUnits: p.packQty, boxPriceCents: p.boxPriceCents, boxActive: p.boxActive, boxOnly: p.boxOnly } : l;
         }),
       );
     });

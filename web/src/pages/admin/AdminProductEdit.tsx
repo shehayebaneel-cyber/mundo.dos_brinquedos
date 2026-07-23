@@ -24,6 +24,7 @@ export function AdminProductEdit() {
     slug: "", name: "", brand: "", sku: "", description: "", categoryId: "",
     price: "", old: "", cost: "", price10: "", wholesale: "", pixPercent: "10",
     stock: "", lowStockAt: "5", minWholesaleQty: "0", packQty: "1", installmentsMax: "12",
+    boxPrice: "", boxActive: false, boxOnly: false,
     subcat: "", ageGroup: "", material: "", weightGrams: "", warranty: "",
     featured: false, isNew: false, bestSeller: false, wholesaleOnly: false, active: true,
   });
@@ -38,6 +39,7 @@ export function AdminProductEdit() {
         slug: p.slug, name: p.name, brand: p.brand, sku: p.sku, description: p.description, categoryId: String(p.categoryId ?? ""),
         price: reais(p.priceCents), old: reais(p.oldPriceCents), cost: reais(p.costCents), price10: reais(p.price10Cents), wholesale: reais(p.wholesaleCents), pixPercent: String(p.pixPercent),
         stock: String(p.stock), lowStockAt: String(p.lowStockAt), minWholesaleQty: String(p.minWholesaleQty), packQty: String(p.packQty), installmentsMax: String(p.installmentsMax),
+        boxPrice: reais(p.boxPriceCents), boxActive: p.boxActive, boxOnly: p.boxOnly,
         subcat: p.subcat, ageGroup: p.ageGroup, material: p.material, weightGrams: String(p.weightGrams), warranty: p.warranty,
         featured: p.featured, isNew: p.isNew, bestSeller: p.bestSeller, wholesaleOnly: p.wholesaleOnly, active: p.active,
       });
@@ -72,6 +74,7 @@ export function AdminProductEdit() {
       wholesaleCents: f.wholesale ? cents(f.wholesale) : null, pixPercent: Number(f.pixPercent),
       stock: Number(f.stock), lowStockAt: Number(f.lowStockAt), minWholesaleQty: Number(f.minWholesaleQty),
       packQty: Number(f.packQty), installmentsMax: Number(f.installmentsMax),
+      boxPriceCents: f.boxPrice ? cents(f.boxPrice) : null, boxActive: f.boxActive, boxOnly: f.boxOnly,
       subcat: f.subcat, ageGroup: f.ageGroup, material: f.material, weightGrams: Number(f.weightGrams), warranty: f.warranty,
       featured: f.featured, isNew: f.isNew, bestSeller: f.bestSeller, wholesaleOnly: f.wholesaleOnly, active: f.active,
       images: images.filter((i) => i.url.trim()),
@@ -154,8 +157,20 @@ export function AdminProductEdit() {
             <F k="stock" label={t("Quantidade em estoque")} type="number" />
             <F k="lowStockAt" label={t("Alerta estoque baixo")} type="number" />
             <F k="minWholesaleQty" label={t("Qtd. mínima atacado")} type="number" />
-            <F k="packQty" label={t("Unidades por caixa")} type="number" />
             <F k="weightGrams" label={t("Peso (gramas)")} type="number" />
+          </div>
+        </section>
+
+        <section className="rounded-[16px] border border-line bg-surface p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display font-bold text-ink">{t("Caixa fechada")}</h2>
+            <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={f.boxActive} onChange={(e) => set("boxActive", e.target.checked)} className="accent-brand" /> {t("Ativar preço de caixa")}</label>
+          </div>
+          <p className="mb-3 mt-1 text-xs text-muted">{t("Cada caixa completa é cobrada pelo preço da caixa; unidades avulsas usam o preço unitário do nível do carrinho.")}</p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <F k="packQty" label={t("Unidades por caixa")} type="number" />
+            <F k="boxPrice" label={t("Preço da caixa (R$)")} type="number" />
+            <label className="flex items-center gap-2 pt-6 text-sm"><input type="checkbox" checked={f.boxOnly} onChange={(e) => set("boxOnly", e.target.checked)} className="accent-brand" /> {t("Só vender em caixas completas")}</label>
           </div>
         </section>
 

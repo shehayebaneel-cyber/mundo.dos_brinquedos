@@ -142,8 +142,8 @@ export function Checkout() {
           <div className="mt-3 max-h-48 space-y-2 overflow-y-auto text-sm">
             {cart.lines.map((l) => (
               <div key={`${l.productId}-${l.variant}`} className="flex justify-between gap-2">
-                <span className="text-muted">{l.qty}x {l.name}{l.variant ? ` (${l.variant})` : ""}</span>
-                <span className="tabular">{brl(l.unitCents * l.qty)}</span>
+                <span className="text-muted">{l.qty}x {l.name}{l.variant ? ` (${l.variant})` : ""}{l.boxes > 0 ? ` · ${l.boxes}📦` : ""}</span>
+                <span className="tabular">{brl(l.lineTotalCents)}</span>
               </div>
             ))}
           </div>

@@ -24,7 +24,7 @@ export function ProductCard({ p }: { p: Product }) {
     e.preventDefault();
     if (out) return;
     if (hasVariants) return void nav(`/produto/${p.slug}`);
-    cart.add({ productId: p.id, slug: p.slug, name: tf(p, "name"), regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents, image: p.images[0]?.url ?? "", variant: "", stock: p.stock });
+    cart.add({ productId: p.id, slug: p.slug, name: tf(p, "name"), regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents, image: p.images[0]?.url ?? "", variant: "", stock: p.stock, boxUnits: p.packQty, boxPriceCents: p.boxPriceCents, boxActive: p.boxActive, boxOnly: p.boxOnly });
   }
 
   return (

@@ -14,6 +14,7 @@ export type Product = {
   categoryId: number | null; category?: Category | null;
   priceCents: number; oldPriceCents: number | null; costCents: number; price10Cents: number | null; wholesaleCents: number | null;
   pixPercent: number; stock: number; lowStockAt: number; minWholesaleQty: number; packQty: number;
+  boxPriceCents: number | null; boxActive: boolean; boxOnly: boolean;
   installmentsMax: number; subcat: string; ageGroup: string; material: string; weightGrams: number; warranty: string;
   featured: boolean; isNew: boolean; bestSeller: boolean; wholesaleOnly: boolean; active: boolean;
   images: ProductImage[]; variants: Variant[]; reviews?: Review[];

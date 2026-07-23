@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { PrismaClient } from "@prisma/client";
-import { cartTier, unitForTier, type Tier } from "./pricing.js";
+import { cartTier, lineTotal, type Tier } from "./pricing.js";
 
 const db = new PrismaClient();
 const app = express();
@@ -162,9 +162,10 @@ app.post("/api/orders", asyncH(async (req, res) => {
   const orderItems: { productId: number; name: string; variant: string; priceCents: number; qty: number }[] = [];
   for (const { p, qty, variant } of valid) {
     if (p.stock < qty) return res.status(409).json({ error: `Estoque insuficiente para ${p.name}. Restam ${p.stock}.` });
-    const unit = unitForTier({ regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents }, tier);
-    subtotal += unit * qty;
-    orderItems.push({ productId: p.id, name: p.name, variant, priceCents: unit, qty });
+    const lt = lineTotal({ regularCents: p.priceCents, price10Cents: p.price10Cents, wholesaleCents: p.wholesaleCents, boxUnits: p.packQty, boxPriceCents: p.boxPriceCents, boxActive: p.boxActive, qty }, tier);
+    subtotal += lt.total;
+    // store an effective per-unit price (line total is authoritative via order subtotal)
+    orderItems.push({ productId: p.id, name: p.name, variant, priceCents: Math.round(lt.total / qty), qty });
   }
 
   const shippingCents = Math.max(0, num(b.shippingCents, 0));
@@ -242,6 +243,7 @@ function productData(b: Record<string, unknown>) {
     wholesaleCents: b.wholesaleCents ? num(b.wholesaleCents) : null,
     pixPercent: num(b.pixPercent, 10), stock: num(b.stock), lowStockAt: num(b.lowStockAt, 5),
     minWholesaleQty: num(b.minWholesaleQty), packQty: num(b.packQty, 1), installmentsMax: num(b.installmentsMax, 12),
+    boxPriceCents: b.boxPriceCents ? num(b.boxPriceCents) : null, boxActive: bool(b.boxActive), boxOnly: bool(b.boxOnly),
     subcat: str(b.subcat), ageGroup: str(b.ageGroup), material: str(b.material), weightGrams: num(b.weightGrams), warranty: str(b.warranty),
     featured: bool(b.featured), isNew: bool(b.isNew), bestSeller: bool(b.bestSeller),
     wholesaleOnly: bool(b.wholesaleOnly), active: b.active === undefined ? true : bool(b.active),

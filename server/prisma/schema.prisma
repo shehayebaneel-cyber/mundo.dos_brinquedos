@@ -51,7 +51,10 @@ model Product {
   stock           Int              @default(0)
   lowStockAt      Int              @default(5)
   minWholesaleQty Int              @default(0)
-  packQty         Int              @default(1) // units per box/package
+  packQty         Int              @default(1) // units per full box
+  boxPriceCents   Int? // fixed price for one full box (overrides per-unit for complete boxes)
+  boxActive       Boolean          @default(false) // full-box pricing enabled
+  boxOnly         Boolean          @default(false) // customers must order in full-box multiples
   installmentsMax Int              @default(12)
   subcat          String           @default("") // subcategory within its category (e.g. Motos, Quebra-cabeças)
   ageGroup        String           @default("")

@@ -24,3 +24,16 @@ export function cartTier(totalItems: number, grossCents: number, thresholdCents:
   if (totalItems >= TIER2_MIN_ITEMS) return 2;
   return 1;
 }
+
+// Full-box pricing: complete boxes at the fixed box price, remainder at the tier unit price.
+export function lineTotal(
+  l: TierPrices & { boxUnits: number; boxPriceCents: number | null; boxActive: boolean; qty: number },
+  tier: Tier,
+): { boxes: number; remainderUnits: number; unitCents: number; boxPriceCents: number; total: number } {
+  const unitCents = unitForTier(l, tier);
+  const usesBox = l.boxActive && l.boxUnits > 0 && l.boxPriceCents != null;
+  const boxes = usesBox ? Math.floor(l.qty / l.boxUnits) : 0;
+  const boxPriceCents = usesBox ? (l.boxPriceCents as number) : 0;
+  const remainderUnits = l.qty - boxes * l.boxUnits;
+  return { boxes, remainderUnits, unitCents, boxPriceCents, total: boxes * boxPriceCents + remainderUnits * unitCents };
+}

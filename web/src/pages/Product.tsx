@@ -35,6 +35,8 @@ export function Product() {
     api.get<{ product: P; related: P[] }>(`/api/products/${slug}`).then(setData).catch(() => setData(null));
   }, [slug]);
 
+  useEffect(() => { const pp = data?.product; if (pp?.boxOnly && pp.packQty > 1) setQty(pp.packQty); }, [data]);
+
   const kinds = useMemo(() => {
     const p = data?.product;
     if (!p) return {} as Record<string, P["variants"]>;
@@ -59,10 +61,11 @@ export function Product() {
   const missingVariant = Object.keys(kinds).some((k) => !picked[k]);
   const variantLabel = Object.values(picked).join(" · ");
   const name = tf(p, "name");
+  const qtyStep = p.boxOnly && p.packQty > 1 ? p.packQty : 1;
 
   const avg = p.reviews && p.reviews.length ? p.reviews.reduce((s, r) => s + r.rating, 0) / p.reviews.length : 0;
 
-  function doAdd(buyNow = false) {
+  function doAdd(buyNow = false, qtyOverride?: number) {
     if (out || missingVariant) return;
     cart.add(
       {
@@ -70,8 +73,9 @@ export function Product() {
         regularCents: p.priceCents + deltaCents,
         price10Cents: p.price10Cents != null ? p.price10Cents + deltaCents : null,
         wholesaleCents: p.wholesaleCents != null ? p.wholesaleCents + deltaCents : null,
+        boxUnits: p.packQty, boxPriceCents: p.boxPriceCents, boxActive: p.boxActive, boxOnly: p.boxOnly,
       },
-      qty,
+      qtyOverride ?? qty,
     );
     if (buyNow) nav("/carrinho");
     else {
@@ -147,6 +151,24 @@ export function Product() {
                 <p className="mt-1.5 text-[11px] text-muted">{t("Vale para o carrinho todo, misturando qualquer produto.")}</p>
               </div>
             )}
+
+            {p.boxActive && p.packQty > 1 && p.boxPriceCents != null && (
+              <div className="mt-3 rounded-xl border-2 border-grape/40 bg-grape/5 p-3">
+                <p className="text-xs font-extrabold uppercase tracking-wide text-grape">📦 {t("Caixa fechada")}</p>
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-display text-2xl font-extrabold tabular text-grape">{brl(p.boxPriceCents)}</span>
+                  <span className="text-sm text-muted">{t("por caixa de {n} unidades", { n: p.packQty })}</span>
+                  <span className="text-xs text-muted">({brl(Math.round(p.boxPriceCents / p.packQty))} {t("cada")})</span>
+                </div>
+                {p.packQty * priceCents - p.boxPriceCents > 0 && (
+                  <p className="mt-0.5 text-xs font-bold text-pix">{t("Economize {v} por caixa", { v: brl(p.packQty * priceCents - p.boxPriceCents) })}</p>
+                )}
+                <button type="button" onClick={() => doAdd(false, p.packQty)} disabled={out || missingVariant} className="btn mt-2 w-full bg-grape py-2.5 text-white disabled:opacity-50">📦 {t("Comprar caixa completa")}</button>
+                {qty > 0 && qty % p.packQty !== 0 && (
+                  <p className="mt-1.5 text-[11px] text-muted">{t("Faltam {n} unidades para completar uma caixa.", { n: p.packQty - (qty % p.packQty) })}</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* VARIANTS */}
@@ -176,11 +198,12 @@ export function Product() {
             </span>
             {!out && (
               <div className="flex items-center rounded-full border border-line">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="px-3 py-1.5 text-lg">−</button>
+                <button onClick={() => setQty((q) => Math.max(qtyStep, q - qtyStep))} className="px-3 py-1.5 text-lg">−</button>
                 <span className="min-w-8 text-center font-bold tabular">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(p.stock, q + 1))} className="px-3 py-1.5 text-lg">+</button>
+                <button onClick={() => setQty((q) => Math.min(p.stock, q + qtyStep))} className="px-3 py-1.5 text-lg">+</button>
               </div>
             )}
+            {p.boxOnly && p.packQty > 1 && <span className="text-xs font-semibold text-grape">📦 {t("vendido em caixas de {n}", { n: p.packQty })}</span>}
           </div>
 
           {/* CTAs (desktop) */}

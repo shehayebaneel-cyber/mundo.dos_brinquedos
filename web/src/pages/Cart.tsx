@@ -28,6 +28,7 @@ export function Cart() {
           <TierBanner />
           {cart.lines.map((l) => {
             const discounted = l.unitCents < l.regularCents;
+            const step = l.boxOnly && l.boxUnits > 0 ? l.boxUnits : 1;
             return (
               <div key={`${l.productId}-${l.variant}`} className="flex gap-3 rounded-[16px] border border-line bg-surface p-3">
                 <Link to={`/produto/${l.slug}`} className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-line">
@@ -36,17 +37,32 @@ export function Cart() {
                 <div className="flex flex-1 flex-col">
                   <Link to={`/produto/${l.slug}`} className="text-sm font-semibold leading-tight text-ink">{l.name}</Link>
                   {l.variant && <span className="text-xs text-muted">{l.variant}</span>}
-                  <span className="mt-0.5 text-xs text-muted tabular">
-                    {brl(l.unitCents)} {t("cada")}
-                    {discounted && <span className="ml-1 text-muted line-through">{brl(l.regularCents)}</span>}
-                  </span>
-                  <div className="mt-auto flex items-center justify-between">
-                    <div className="flex items-center rounded-full border border-line">
-                      <button onClick={() => cart.setQty(l.productId, l.variant, l.qty - 1)} className="px-2.5 py-1 text-lg">−</button>
-                      <span className="min-w-7 text-center text-sm font-bold tabular">{l.qty}</span>
-                      <button onClick={() => cart.setQty(l.productId, l.variant, l.qty + 1)} className="px-2.5 py-1 text-lg">+</button>
+                  {l.boxes > 0 ? (
+                    <div className="mt-1 space-y-0.5 text-xs">
+                      <div className="flex justify-between gap-2 font-semibold text-grape">
+                        <span>📦 {t("{b} caixa(s) com {u} unidades", { b: l.boxes, u: l.boxUnits })}</span>
+                        <span className="tabular">{brl(l.boxes * l.boxPriceCents)}</span>
+                      </div>
+                      {l.remainderUnits > 0 && (
+                        <div className="flex justify-between gap-2 text-muted">
+                          <span>{t("{n} unidades adicionais", { n: l.remainderUnits })} · {brl(l.unitCents)} {t("cada")}</span>
+                          <span className="tabular">{brl(l.remainderUnits * l.unitCents)}</span>
+                        </div>
+                      )}
                     </div>
-                    <span className="font-display font-extrabold text-brand tabular">{brl(l.unitCents * l.qty)}</span>
+                  ) : (
+                    <span className="mt-0.5 text-xs text-muted tabular">
+                      {brl(l.unitCents)} {t("cada")}
+                      {discounted && <span className="ml-1 text-muted line-through">{brl(l.regularCents)}</span>}
+                    </span>
+                  )}
+                  <div className="mt-auto flex items-center justify-between pt-1.5">
+                    <div className="flex items-center rounded-full border border-line">
+                      <button onClick={() => cart.setQty(l.productId, l.variant, l.qty - step)} className="px-2.5 py-1 text-lg">−</button>
+                      <span className="min-w-7 text-center text-sm font-bold tabular">{l.qty}</span>
+                      <button onClick={() => cart.setQty(l.productId, l.variant, l.qty + step)} className="px-2.5 py-1 text-lg">+</button>
+                    </div>
+                    <span className="font-display font-extrabold text-brand tabular">{brl(l.lineTotalCents)}</span>
                   </div>
                 </div>
                 <button onClick={() => cart.remove(l.productId, l.variant)} className="self-start text-muted hover:text-danger" aria-label={t("Remover")}>✕</button>
