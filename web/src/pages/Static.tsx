@@ -9,12 +9,12 @@ export function Sobre() {
   const bodyPt = [
     "A Mundo dos Brinquedos e Variedades nasceu em Goiânia com um propósito simples: levar diversão de qualidade para as crianças de todo o Brasil, com preço justo tanto para as famílias quanto para os lojistas.",
     "Somos referência em varejo e atacado, com uma seleção cuidadosa de brinquedos, bonecas, bicicletas, produtos educativos e variedades. Nossa comunidade já reúne mais de 13 mil seguidores no Instagram que acompanham nossas novidades toda semana.",
-    "Trabalhamos com entrega para todo o território nacional, atendimento próximo pelo WhatsApp e pagamento seguro. Cada pedido é embalado com carinho — porque sabemos que do outro lado há sempre um sorriso esperando.",
+    "Atendimento próximo e direto pelo WhatsApp: você faz o pedido pelo site e a gente combina o resto com você. Cada pedido é embalado com carinho — porque sabemos que do outro lado há sempre um sorriso esperando.",
   ];
   const bodyEn = [
     "Mundo dos Brinquedos e Variedades was born in Goiânia with a simple purpose: to bring quality fun to children all over Brazil, at a fair price for families and retailers alike.",
     "We're a reference in retail and wholesale, with a carefully curated selection of toys, dolls, bikes, educational products and variety items. Our community already includes over 13,000 Instagram followers who keep up with our new arrivals every week.",
-    "We deliver across the whole country, offer close support over WhatsApp and secure payment. Every order is packed with care — because we know there's always a smile waiting on the other side.",
+    "Close, direct support over WhatsApp: you place the order on the site and we sort out the rest with you. Every order is packed with care — because we know there's always a smile waiting on the other side.",
   ];
   const body = lang === "en" ? bodyEn : bodyPt;
   return (
@@ -24,7 +24,7 @@ export function Sobre() {
         {body.map((p, i) => <p key={i}>{p}</p>)}
       </div>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        {[["🚚", "Entrega para todo o Brasil"], ["🏷️", "Atacado e varejo"], ["💬", "Atendimento no WhatsApp"]].map(([i, key]) => (
+        {[["🏷️", "Atacado e varejo"], ["💬", "Atendimento no WhatsApp"], ["🛍️", "Retirada em Goiânia"]].map(([i, key]) => (
           <div key={key} className="rounded-[16px] border border-line bg-surface p-4 text-center"><div className="text-3xl">{i}</div><p className="mt-1 font-bold text-ink">{t(key)}</p></div>
         ))}
       </div>
@@ -78,28 +78,24 @@ export function Contato() {
 }
 
 const FAQ_PT: [string, string][] = [
-  ["Vocês entregam para todo o Brasil?", "Sim! Enviamos para todo o território nacional pelos Correios e transportadoras parceiras."],
-  ["Como o frete é calculado?", "O frete é calculado pelo seu CEP, considerando peso e dimensões do produto. É só informar o CEP na página do produto ou no checkout."],
-  ["Quais as formas de pagamento?", "Aceitamos Pix, cartão de crédito (com parcelamento), cartão de débito e boleto bancário."],
-  ["Posso pagar com Pix?", "Sim, e com desconto! O Pix tem aprovação na hora e liberamos seu pedido rapidinho."],
-  ["Posso parcelar?", "Sim, no cartão de crédito você parcela em até 12x sem juros, conforme o valor do pedido."],
-  ["Como funciona a compra no atacado?", "Basta criar uma conta atacado e aguardar a aprovação. Depois, você vê preços especiais e quantidades mínimas por produto."],
-  ["Qual o pedido mínimo no atacado?", "O pedido mínimo é de R$ 300, e alguns produtos têm quantidade mínima por caixa."],
-  ["Como acompanho meu pedido?", "Na página 'Rastrear pedido', informe o número do pedido e seu e-mail ou telefone."],
+  ["Como faço um pedido?", "É só escolher os produtos, adicionar ao carrinho e enviar o pedido com seu nome e WhatsApp. Depois, entramos em contato pelo WhatsApp para combinar o pagamento e a entrega ou retirada."],
+  ["Preciso pagar pelo site?", "Não. O site só registra o seu pedido. O pagamento é combinado diretamente com a gente pelo WhatsApp."],
+  ["Como funciona o preço de atacado?", "O preço de atacado é automático para todos — sem cadastro e sem aprovação. Conforme você vai adicionando itens ao carrinho, o desconto entra sozinho."],
+  ["Preciso me cadastrar para comprar no atacado?", "Não. Não existe cadastro nem aprovação de atacado. Basta montar o carrinho e o melhor preço aparece automaticamente."],
+  ["O que preciso para finalizar o pedido?", "Só o seu nome e um número de WhatsApp. Não pedimos e-mail, senha nem endereço no site."],
+  ["Como acompanho meu pedido?", "Entre em 'Minha conta' com o mesmo nome e WhatsApp para ver seus pedidos. E qualquer dúvida é só falar com a gente no WhatsApp."],
   ["Posso trocar ou devolver um produto?", "Sim. Você tem até 7 dias corridos após o recebimento para solicitar troca ou devolução, conforme o Código de Defesa do Consumidor."],
-  ["Posso retirar em Goiânia?", "Sim! Oferecemos retirada gratuita na nossa loja em Goiânia."],
+  ["Posso retirar em Goiânia?", "Sim! Combinamos a retirada na nossa loja em Goiânia pelo WhatsApp."],
 ];
 const FAQ_EN: [string, string][] = [
-  ["Do you deliver throughout Brazil?", "Yes! We ship nationwide via the Correios and partner carriers."],
-  ["How is shipping calculated?", "Shipping is calculated from your postcode (CEP), based on the product's weight and dimensions. Just enter your CEP on the product page or at checkout."],
-  ["What are the payment methods?", "We accept Pix, credit card (with instalments), debit card and bank slip (boleto)."],
-  ["Can I pay with Pix?", "Yes — and with a discount! Pix is approved instantly and we release your order right away."],
-  ["Can I pay in instalments?", "Yes, on credit card you can split into up to 12 interest-free instalments, depending on the order value."],
-  ["How does wholesale buying work?", "Just create a wholesale account and wait for approval. Then you'll see special prices and minimum quantities per product."],
-  ["What is the minimum wholesale order?", "The minimum order is R$ 300, and some products have a minimum quantity per case."],
-  ["How do I track my order?", "On the 'Track order' page, enter your order number and your email or phone."],
+  ["How do I place an order?", "Just pick your products, add them to the cart and submit the order with your name and WhatsApp. We'll then get in touch on WhatsApp to arrange payment and pickup or delivery."],
+  ["Do I have to pay on the website?", "No. The site only registers your order. Payment is arranged directly with us over WhatsApp."],
+  ["How does wholesale pricing work?", "Wholesale pricing is automatic for everyone — no registration and no approval. As you add items to the cart, the discount kicks in on its own."],
+  ["Do I need to register to buy wholesale?", "No. There's no wholesale registration or approval. Just build your cart and the best price shows up automatically."],
+  ["What do I need to finish the order?", "Only your name and a WhatsApp number. We don't ask for email, password or address on the site."],
+  ["How do I track my order?", "Sign in to 'My account' with the same name and WhatsApp to see your orders. For anything else, just message us on WhatsApp."],
   ["Can I exchange or return a product?", "Yes. You have up to 7 calendar days after delivery to request an exchange or return, under Brazil's Consumer Protection Code."],
-  ["Can I collect my order in Goiânia?", "Yes! We offer free store pickup in Goiânia."],
+  ["Can I collect my order in Goiânia?", "Yes! We arrange store pickup in Goiânia over WhatsApp."],
 ];
 
 export function FAQ() {
@@ -133,10 +129,6 @@ const POLICIES: Record<string, { pt: Pol; en: Pol }> = {
     pt: { title: "Termos e Condições", body: ["Ao usar este site, você concorda com nossos termos de uso.", "Os preços e a disponibilidade dos produtos podem mudar sem aviso prévio.", "Pedidos só são confirmados após a aprovação do pagamento.", "Em caso de divergência, entre em contato com nosso atendimento."] },
     en: { title: "Terms & Conditions", body: ["By using this website, you agree to our terms of use.", "Product prices and availability may change without prior notice.", "Orders are only confirmed after payment approval.", "In case of any discrepancy, please contact our support."] },
   },
-  entrega: {
-    pt: { title: "Política de Entrega e Frete", body: ["Entregamos para todo o Brasil via Correios e transportadoras.", "O prazo de entrega é calculado a partir da confirmação do pagamento.", "O valor do frete depende do CEP, peso e dimensões dos produtos.", "Oferecemos retirada gratuita na loja em Goiânia."] },
-    en: { title: "Shipping & Delivery Policy", body: ["We deliver across Brazil via the Correios and carriers.", "Delivery time is counted from payment confirmation.", "The shipping cost depends on the postcode (CEP), weight and dimensions of the products.", "We offer free store pickup in Goiânia."] },
-  },
   trocas: {
     pt: { title: "Trocas e Devoluções", body: ["Você tem até 7 dias corridos após o recebimento para solicitar troca ou devolução (arrependimento), conforme o CDC.", "O produto deve estar sem uso, na embalagem original.", "Produtos com defeito são trocados sem custo.", "Para iniciar, fale com nosso atendimento com o número do pedido em mãos."] },
     en: { title: "Exchanges & Returns", body: ["You have up to 7 calendar days after delivery to request an exchange or return (right of withdrawal), under Brazil's Consumer Protection Code.", "The product must be unused and in its original packaging.", "Defective products are exchanged at no cost.", "To start, contact our support with your order number to hand."] },
@@ -146,8 +138,8 @@ const POLICIES: Record<string, { pt: Pol; en: Pol }> = {
     en: { title: "Refund Policy", body: ["Refunds are processed after we receive and check the returned product.", "Pix payments are refunded to the same key; card payments on the statement.", "The refund time varies according to the payment method."] },
   },
   pagamento: {
-    pt: { title: "Política de Pagamento", body: ["Aceitamos Pix, cartão de crédito, débito e boleto bancário.", "O Pix tem desconto e aprovação imediata.", "Parcelamos em até 12x sem juros no cartão.", "Todos os pagamentos são processados em ambiente seguro."] },
-    en: { title: "Payment Policy", body: ["We accept Pix, credit card, debit card and bank slip (boleto).", "Pix comes with a discount and instant approval.", "We offer up to 12 interest-free instalments on credit card.", "All payments are processed in a secure environment."] },
+    pt: { title: "Política de Pagamento", body: ["O pagamento não é feito pelo site. Você envia o pedido e combinamos o pagamento diretamente pelo WhatsApp.", "Trabalhamos com as formas de pagamento mais convenientes para você, acertadas no atendimento.", "Confirmamos cada pedido pelo WhatsApp antes de qualquer pagamento."] },
+    en: { title: "Payment Policy", body: ["Payment is not made on the website. You submit your order and we arrange payment directly over WhatsApp.", "We work with the payment methods most convenient for you, agreed during support.", "We confirm every order over WhatsApp before any payment."] },
   },
   cookies: {
     pt: { title: "Política de Cookies", body: ["Usamos cookies para manter seu carrinho, lembrar preferências e medir o desempenho do site.", "Você pode aceitar ou recusar cookies não essenciais pelo aviso exibido na primeira visita.", "Cookies essenciais são necessários para o funcionamento da loja."] },
@@ -169,20 +161,3 @@ export function Policy({ which }: { which: keyof typeof POLICIES }) {
   );
 }
 
-export function Account() {
-  const { t } = useI18n();
-  return (
-    <div className="mx-auto max-w-md px-4 py-12 text-center">
-      <p className="text-5xl">👤</p>
-      <h1 className="mt-3 font-display text-2xl font-extrabold text-ink">{t("Minha conta")}</h1>
-      <p className="mt-1 text-muted">{t("Entre para ver seus pedidos, favoritos e endereços — ou continue como visitante.")}</p>
-      <div className="mt-5 space-y-2">
-        <input placeholder={t("E-mail")} className="w-full rounded-lg border border-line px-3 py-2.5 text-sm" />
-        <input type="password" placeholder={t("Senha")} className="w-full rounded-lg border border-line px-3 py-2.5 text-sm" />
-        <button className="btn btn-primary w-full py-3">{t("Entrar")}</button>
-        <Link to="/rastrear" className="btn btn-ghost w-full py-2.5 text-sm">{t("Rastrear um pedido sem login")}</Link>
-      </div>
-      <p className="mt-4 text-xs text-muted">{t("O login de clientes será ativado na Fase 2. No protótipo, os pedidos ficam visíveis no painel do admin.")}</p>
-    </div>
-  );
-}

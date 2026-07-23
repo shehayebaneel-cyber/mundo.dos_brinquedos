@@ -50,7 +50,6 @@ function StoreSettings() {
           <p className="mt-1 text-[11px] text-muted">{t("Ex.: 30000 = R$300. Quando o carrinho atinge este valor, todos os produtos recebem o preço de atacado (nível 3). O nível 2 é fixo em 10 itens.")}</p>
         </div>
         <div><label className={lbl}>{t("Pedido mínimo atacado (centavos)")}</label><input value={s.wholesaleMinOrderCents ?? ""} onChange={(e) => set("wholesaleMinOrderCents", e.target.value)} className={input} /></div>
-        <div><label className={lbl}>{t("Frete grátis acima de (centavos)")}</label><input value={s.freeShippingMinCents ?? ""} onChange={(e) => set("freeShippingMinCents", e.target.value)} className={input} /></div>
       </div>
       <button onClick={save} className="btn btn-primary mt-4 px-6 py-2.5">{saved ? t("✓ Salvo!") : t("Salvar informações")}</button>
     </div>

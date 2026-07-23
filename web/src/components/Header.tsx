@@ -66,7 +66,7 @@ export function Header() {
           <CatPill to="/produtos" emoji="🛍️" label={t("Todos os produtos")} accent="ink" />
           <CatPill to="/ofertas" emoji="🏷️" label={t("Ofertas")} accent="brand" solid />
           <CatPill to="/atacado" emoji="📦" label={t("Atacado")} accent="grape" solid />
-          <CatPill to="/rastrear" emoji="🚚" label={t("Rastrear pedido")} accent="sky" />
+          <CatPill to="/conta" emoji="👤" label={t("Minha conta")} accent="sky" />
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export function Header() {
         <CatPill to="/produtos" emoji="🛍️" label={t("Todos")} accent="ink" />
         <CatPill to="/ofertas" emoji="🏷️" label={t("Ofertas")} accent="brand" solid />
         <CatPill to="/atacado" emoji="📦" label={t("Atacado")} accent="grape" solid />
-        <CatPill to="/rastrear" emoji="🚚" label={t("Rastrear pedido")} accent="sky" />
+        <CatPill to="/conta" emoji="👤" label={t("Minha conta")} accent="sky" />
       </div>
 
       {/* mobile drawer — portaled to <body> so it sits above the whole page */}
@@ -106,7 +106,6 @@ export function Header() {
                 <Link to="/ofertas" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold text-brand-dark hover:bg-surface-2">🏷️ {t("Ofertas")}</Link>
                 <Link to="/atacado" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold hover:bg-surface-2">📦 {t("Atacado")}</Link>
                 <Link to="/conta" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">👤 {t("Minha conta")}</Link>
-                <Link to="/rastrear" onClick={() => setMenu(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold hover:bg-surface-2">🚚 {t("Rastrear pedido")}</Link>
               </nav>
             </div>
           </div>

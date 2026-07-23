@@ -33,10 +33,10 @@ export function AdminDashboard() {
       <h1 className="mb-4 font-display text-2xl font-extrabold text-ink">{t("Painel")}</h1>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Card label={t("Faturamento (pago)")} value={brl(o.revenueCents)} tone="text-pix" sub={t("Mês: {v}", { v: brl(o.revenueMonthCents) })} />
-        <Card label={t("Pedidos")} value={String(o.ordersTotal)} sub={t("{n} aguardando pagamento", { n: o.pending })} />
+        <Card label={t("Faturamento (concluído)")} value={brl(o.revenueCents)} tone="text-pix" sub={t("Mês: {v}", { v: brl(o.revenueMonthCents) })} />
+        <Card label={t("Pedidos")} value={String(o.ordersTotal)} sub={t("{n} novos para contatar", { n: o.pending })} />
         <Card label={t("Ticket médio")} value={brl(o.avgTicketCents)} />
-        <Card label={t("A enviar")} value={String(o.awaitingShipment)} tone="text-warn" />
+        <Card label={t("Novos pedidos")} value={String(o.pending)} tone="text-warn" />
         <Card label={t("Varejo")} value={brl(o.retailCents)} />
         <Card label={t("Atacado")} value={brl(o.wholesaleCents)} tone="text-grape" />
         <Card label={t("Produtos")} value={String(o.productsTotal)} />
@@ -45,9 +45,9 @@ export function AdminDashboard() {
 
       <h2 className="mb-2 mt-6 font-display text-lg font-extrabold text-ink">{t("Precisa de atenção")}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Alert to="/admin/pedidos" label={t("Novos pedidos")} n={o.pending} tone="bg-warn/10 text-warn" />
         <Alert to="/admin/produtos" label={t("Sem estoque")} n={o.outStock} tone="bg-danger/10 text-danger" />
         <Alert to="/admin/produtos" label={t("Estoque baixo")} n={o.lowStock} tone="bg-warn/10 text-warn" />
-        <Alert to="/admin/atacado" label={t("Atacado pendente")} n={o.wholesalePending} tone="bg-grape/10 text-grape" />
         <Alert to="/admin/avaliacoes" label={t("Avaliações a aprovar")} n={o.reviewsPending} tone="bg-sky/10 text-sky" />
       </div>
 

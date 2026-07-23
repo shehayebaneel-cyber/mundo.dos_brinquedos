@@ -23,8 +23,6 @@ export function Product() {
   const [imgIdx, setImgIdx] = useState(0);
   const [picked, setPicked] = useState<Record<string, string>>({});
   const [qty, setQty] = useState(1);
-  const [cep, setCep] = useState("");
-  const [ship, setShip] = useState<{ label: string; price: string; days: string }[] | null>(null);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
@@ -82,17 +80,6 @@ export function Product() {
       setAdded(true);
       setTimeout(() => setAdded(false), 1800);
     }
-  }
-
-  function calcShip(e: React.FormEvent) {
-    e.preventDefault();
-    const free = Number(settings.freeShippingMinCents ?? 19900);
-    const opts = [
-      { label: "PAC (Correios)", price: brl(2490), days: "5 a 9 dias úteis" },
-      { label: "SEDEX (Correios)", price: brl(3990), days: "2 a 4 dias úteis" },
-    ];
-    if (priceCents * qty >= free) opts.unshift({ label: "Frete grátis", price: brl(0), days: "5 a 9 dias úteis" });
-    setShip(opts);
   }
 
   return (
@@ -216,22 +203,11 @@ export function Product() {
 
           <a href={waLink(settings.whatsapp ?? "", `${name} (${brl(priceCents)})`)} target="_blank" rel="noreferrer" className="btn mt-2 w-full border border-[#25d366] py-2.5 text-[#128c4a]">{t("💬 Tirar dúvida no WhatsApp")}</a>
 
-          {/* SHIPPING */}
-          <form onSubmit={calcShip} className="mt-4 rounded-[16px] border border-line bg-surface p-4">
-            <p className="text-sm font-bold text-ink">{t("🚚 Calcular frete e prazo")}</p>
-            <div className="mt-2 flex gap-2">
-              <input value={cep} onChange={(e) => setCep(e.target.value)} placeholder={t("Digite seu CEP")} className="flex-1 rounded-lg border border-line px-3 py-2 text-sm" />
-              <button className="btn btn-ghost px-4 py-2 text-sm">{t("Calcular")}</button>
-            </div>
-            {ship && (
-              <ul className="mt-3 space-y-1.5 text-sm">
-                {ship.map((o) => (
-                  <li key={o.label} className="flex justify-between"><span>{t(o.label)} <span className="text-muted">· {t(o.days)}</span></span><span className="font-bold tabular">{o.price}</span></li>
-                ))}
-                <li className="pt-1 text-xs text-muted">{t("Retirada grátis na loja em Goiânia disponível.")}</li>
-              </ul>
-            )}
-          </form>
+          {/* HOW ORDERING WORKS */}
+          <div className="mt-4 rounded-[16px] border border-line bg-surface p-4 text-sm text-muted">
+            <p className="font-bold text-ink">{t("Como comprar")}</p>
+            <p className="mt-1">{t("Adicione ao carrinho e envie o pedido com seu nome e WhatsApp. A gente entra em contato para combinar o pagamento e a retirada ou entrega.")}</p>
+          </div>
         </div>
       </div>
 

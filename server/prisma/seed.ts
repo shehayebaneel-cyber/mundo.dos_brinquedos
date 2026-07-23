@@ -68,8 +68,8 @@ async function main() {
   // ---------- SETTINGS (editable store info) ----------
   const settings: Record<string, string> = {
     storeName: "Mundo dos Brinquedos e Variedades",
-    tagline: "Varejo e atacado · entrega para todo o Brasil",
-    taglineEn: "Retail & wholesale · delivery across Brazil",
+    tagline: "Varejo e atacado · preço de atacado automático",
+    taglineEn: "Retail & wholesale · automatic wholesale pricing",
     whatsapp: "5562981652030",
     whatsappLabel: "+55 62 98165-2030",
     hours: "Seg a Sáb, 08:00–18:00",

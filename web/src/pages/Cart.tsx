@@ -78,7 +78,6 @@ export function Cart() {
             {cart.savingsCents > 0 && (
               <div className="flex justify-between font-bold text-pix"><span>{t("Você economiza")}</span><span className="tabular">− {brl(cart.savingsCents)}</span></div>
             )}
-            <div className="flex justify-between"><span className="text-muted">{t("Frete")}</span><span className="text-muted">{t("calculado no checkout")}</span></div>
           </div>
           <div className="mt-3 flex justify-between border-t border-line pt-3 font-display text-lg font-extrabold text-ink">
             <span>{t("Total")}</span><span className="tabular">{brl(cart.subtotalCents)}</span>

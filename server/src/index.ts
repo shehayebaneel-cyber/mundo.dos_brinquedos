@@ -139,9 +139,12 @@ app.post("/api/orders", asyncH(async (req, res) => {
   if (!items.length) return res.status(400).json({ error: "Seu carrinho está vazio." });
   if (!str(b.name).trim() || !str(b.phone).trim()) return res.status(400).json({ error: "Informe nome e telefone." });
 
+  const name = str(b.name).trim().slice(0, 80);
+  const phone = str(b.phone).replace(/\D/g, ""); // store phone as digits — it is the customer identity
+  if (phone.length < 10) return res.status(400).json({ error: "Informe um WhatsApp válido." });
+
   const ids = items.map((i) => num(i.productId));
   const prods = await db.product.findMany({ where: { id: { in: ids } } });
-  const kind = str(b.kind, "varejo");
 
   // Resolve every line against the DB, then apply the cart-wide price tier.
   // Prices are ALWAYS recomputed here — the client never sets prices.
@@ -155,8 +158,9 @@ app.post("/api/orders", asyncH(async (req, res) => {
   const thresholdCents = Number(thresholdRow?.value ?? 30000) || 0;
   const totalItems = valid.reduce((s, l) => s + l.qty, 0);
   const grossCents = valid.reduce((s, l) => s + l.p.priceCents * l.qty, 0);
-  // approved wholesale orders always get the best (tier 3) price; everyone else follows the cart tier
-  const tier: Tier = kind === "atacado" ? 3 : cartTier(totalItems, grossCents, thresholdCents);
+  // pricing tier is automatic for everyone, based purely on the cart
+  const tier: Tier = cartTier(totalItems, grossCents, thresholdCents);
+  const kind = tier === 3 ? "atacado" : "varejo"; // just a label for the admin
 
   let subtotal = 0;
   const orderItems: { productId: number; name: string; variant: string; priceCents: number; qty: number }[] = [];
@@ -168,9 +172,16 @@ app.post("/api/orders", asyncH(async (req, res) => {
     orderItems.push({ productId: p.id, name: p.name, variant, priceCents: Math.round(lt.total / qty), qty });
   }
 
-  const shippingCents = Math.max(0, num(b.shippingCents, 0));
-  const discountCents = Math.min(Math.max(0, num(b.discountCents, 0)), subtotal); // never exceed the subtotal
-  const total = subtotal - discountCents + shippingCents;
+  // Identify the customer by phone (no email / password / registration).
+  const existing = await db.customer.findFirst({ where: { phone } });
+  let customerId: number;
+  if (existing) {
+    await db.customer.update({ where: { id: existing.id }, data: { name, kind } });
+    customerId = existing.id;
+  } else {
+    const created = await db.customer.create({ data: { name, phone, kind, email: `wa${phone}@mundo.local` } });
+    customerId = created.id;
+  }
 
   const count = await db.order.count();
   const code = `MDB-2026-${String(count + 1).padStart(4, "0")}`;
@@ -179,10 +190,9 @@ app.post("/api/orders", asyncH(async (req, res) => {
     for (const it of orderItems) await tx.product.update({ where: { id: it.productId }, data: { stock: { decrement: it.qty } } });
     return tx.order.create({
       data: {
-        code, customerName: str(b.name), customerPhone: str(b.phone), customerEmail: str(b.email), kind,
-        status: "recebido", paymentMethod: str(b.paymentMethod, "pix"), paymentStatus: "pendente",
-        subtotalCents: subtotal, discountCents, shippingCents, totalCents: total,
-        cep: str(b.cep), address: str(b.address), city: str(b.city), state: str(b.state), note: str(b.note),
+        code, customerId, customerName: name, customerPhone: phone, customerEmail: "", kind,
+        status: "recebido", paymentMethod: "", paymentStatus: "pendente",
+        subtotalCents: subtotal, discountCents: 0, shippingCents: 0, totalCents: subtotal,
         items: { create: orderItems },
       },
       include: { items: true },
@@ -191,18 +201,26 @@ app.post("/api/orders", asyncH(async (req, res) => {
   res.status(201).json(order);
 }));
 
+// order lookup by code (order-confirmation page re-fetch)
 app.get("/api/track", asyncH(async (req, res) => {
   const code = str(req.query.code).trim().toUpperCase();
-  const contact = str(req.query.contact).trim().toLowerCase();
   if (!code) return res.status(400).json({ error: "Informe o número do pedido." });
   const order = await db.order.findUnique({ where: { code }, include: { items: true } });
   if (!order) return res.status(404).json({ error: "Pedido não encontrado." });
-  const ok =
-    !contact ||
-    order.customerEmail.toLowerCase() === contact ||
-    order.customerPhone.replace(/\D/g, "").includes(contact.replace(/\D/g, "")) ;
-  if (!ok) return res.status(403).json({ error: "Dados não conferem com o pedido." });
   res.json(order);
+}));
+
+// customer order history — identity is the WhatsApp phone
+app.get("/api/orders/by-phone", asyncH(async (req, res) => {
+  const phone = str(req.query.phone).replace(/\D/g, "");
+  if (phone.length < 10) return res.json({ orders: [] });
+  const orders = await db.order.findMany({
+    where: { customerPhone: phone },
+    include: { items: true },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+  res.json({ orders });
 }));
 
 // ============================================================ ADMIN
@@ -210,24 +228,25 @@ app.use("/api/admin", requireAdmin);
 
 app.get("/api/admin/overview", asyncH(async (_req, res) => {
   const orders = await db.order.findMany({ include: { items: true } });
-  const paid = orders.filter((o) => o.paymentStatus === "pago");
+  // an order counts as a real sale once it is confirmed or completed
+  const done = orders.filter((o) => ["confirmado", "concluido"].includes(o.status));
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const products = await db.product.findMany();
   res.json({
     ordersTotal: orders.length,
-    pending: orders.filter((o) => o.paymentStatus === "pendente").length,
-    awaitingShipment: orders.filter((o) => ["pago", "em_separacao", "embalado"].includes(o.status)).length,
-    revenueCents: paid.reduce((s, o) => s + o.totalCents, 0),
-    revenueMonthCents: paid.filter((o) => o.createdAt >= monthStart).reduce((s, o) => s + o.totalCents, 0),
-    avgTicketCents: paid.length ? Math.round(paid.reduce((s, o) => s + o.totalCents, 0) / paid.length) : 0,
-    retailCents: paid.filter((o) => o.kind === "varejo").reduce((s, o) => s + o.totalCents, 0),
-    wholesaleCents: paid.filter((o) => o.kind === "atacado").reduce((s, o) => s + o.totalCents, 0),
+    pending: orders.filter((o) => o.status === "recebido").length, // new orders awaiting WhatsApp contact
+    awaitingShipment: orders.filter((o) => o.status === "em_contato").length, // in progress
+    revenueCents: done.reduce((s, o) => s + o.totalCents, 0),
+    revenueMonthCents: done.filter((o) => o.createdAt >= monthStart).reduce((s, o) => s + o.totalCents, 0),
+    avgTicketCents: done.length ? Math.round(done.reduce((s, o) => s + o.totalCents, 0) / done.length) : 0,
+    retailCents: done.filter((o) => o.kind === "varejo").reduce((s, o) => s + o.totalCents, 0),
+    wholesaleCents: done.filter((o) => o.kind === "atacado").reduce((s, o) => s + o.totalCents, 0),
     productsTotal: products.length,
     lowStock: products.filter((p) => p.stock > 0 && p.stock <= p.lowStockAt).length,
     outStock: products.filter((p) => p.stock === 0).length,
     customers: await db.customer.count(),
-    wholesalePending: await db.customer.count({ where: { wholesaleStatus: "pending" } }),
+    wholesalePending: 0, // no wholesale approval anymore
     reviewsPending: await db.review.count({ where: { approved: false } }),
   });
 }));

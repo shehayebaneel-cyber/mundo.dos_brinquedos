@@ -10,10 +10,10 @@ import { Product } from "./pages/Product";
 import { Cart } from "./pages/Cart";
 import { Checkout } from "./pages/Checkout";
 import { OrderConfirmation } from "./pages/OrderConfirmation";
-import { Track } from "./pages/Track";
 import { Atacado } from "./pages/Atacado";
 import { Favoritos } from "./pages/Favoritos";
-import { Account, Contato, FAQ, Policy, Sobre } from "./pages/Static";
+import { Conta } from "./pages/Conta";
+import { Contato, FAQ, Policy, Sobre } from "./pages/Static";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import { AdminProducts } from "./pages/admin/AdminProducts";
@@ -47,16 +47,14 @@ const router = createBrowserRouter([
       { path: "/carrinho", element: <Cart /> },
       { path: "/checkout", element: <Checkout /> },
       { path: "/pedido/:code", element: <OrderConfirmation /> },
-      { path: "/rastrear", element: <Track /> },
       { path: "/atacado", element: <Atacado /> },
       { path: "/favoritos", element: <Favoritos /> },
-      { path: "/conta", element: <Account /> },
+      { path: "/conta", element: <Conta /> },
       { path: "/sobre", element: <Sobre /> },
       { path: "/contato", element: <Contato /> },
       { path: "/faq", element: <FAQ /> },
       { path: "/privacidade", element: <Policy which="privacidade" /> },
       { path: "/termos", element: <Policy which="termos" /> },
-      { path: "/entrega", element: <Policy which="entrega" /> },
       { path: "/trocas", element: <Policy which="trocas" /> },
       { path: "/reembolso", element: <Policy which="reembolso" /> },
       { path: "/pagamento", element: <Policy which="pagamento" /> },

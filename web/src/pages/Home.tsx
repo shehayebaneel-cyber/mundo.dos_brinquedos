@@ -37,12 +37,12 @@ export function Home() {
         <Squiggle className="animate-floaty-fast pointer-events-none absolute left-[34%] bottom-24 hidden h-6 w-24 text-white/40 sm:block" />
         <div className="mx-auto grid max-w-6xl items-center gap-6 px-4 py-6 sm:py-8 lg:grid-cols-2">
           <div className="relative z-10">
-            <span className="inline-flex items-center gap-2 rounded-full bg-yellow px-3 py-1 text-xs font-extrabold text-ink">🎉 {settings.tagline || "Varejo e atacado · entrega para todo o Brasil"}</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-yellow px-3 py-1 text-xs font-extrabold text-ink">🎉 {settings.tagline || "Varejo e atacado · preço de atacado automático"}</span>
             <h1 className="mt-3 font-display text-3xl font-extrabold leading-[1.05] sm:text-5xl">
               O mundo da diversão começa <span className="text-yellow">aqui!</span>
             </h1>
             <p className="mt-2.5 max-w-md text-sm text-white/90 sm:text-base">
-              Carros de ferro, educativos, garrafas e muito mais — <b>varejo e atacado</b>, entrega para todo o Brasil. 🚚
+              Carros de ferro, educativos, garrafas e muito mais — <b>varejo e atacado</b>, com preço de atacado automático no carrinho. 📦
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link to="/produtos" className="btn bg-white px-5 py-2.5 text-blue-dark hover:bg-white/90">🛍️ {t("Ver produtos")}</Link>
@@ -77,8 +77,8 @@ export function Home() {
         {/* ======================= TRUST ======================= */}
         <section className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
           {[
-            ["🚚", "Entrega para todo o Brasil", "sky"],
-            ["🔒", "Pagamento seguro", "mint"],
+            ["📦", "Preço de atacado automático", "sky"],
+            ["🛍️", "Retirada em Goiânia", "mint"],
             ["🏷️", "Atacado e varejo", "orange"],
             ["💬", "Atendimento no WhatsApp", "teal"],
           ].map(([i, key, ac]) => (
@@ -150,21 +150,21 @@ export function Home() {
               <Star className="animate-floaty pointer-events-none absolute right-8 top-6 hidden h-6 w-6 text-yellow sm:block" />
               <div className="relative max-w-lg">
                 <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-extrabold">📦 {t("Atacado")}</span>
-                <h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">{t("🧸📦 Compre no atacado")}</h2>
-                <p className="mt-2 text-white/90">{t("Preços especiais para lojistas e revendedores. Pedido mínimo de {min} · entrega para todo o Brasil.", { min: brl(wholesaleMin) })}</p>
+                <h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">{t("🧸📦 Preço de atacado para todos")}</h2>
+                <p className="mt-2 text-white/90">{t("Sem cadastro e sem aprovação. O desconto de atacado entra sozinho no carrinho a partir de {min}.", { min: brl(wholesaleMin) })}</p>
                 <div className="mt-5 flex flex-wrap gap-2.5">
-                  <Link to="/atacado" className="btn bg-yellow px-6 py-3 text-ink hover:brightness-95">{t("Criar conta atacado")}</Link>
+                  <Link to="/atacado" className="btn bg-yellow px-6 py-3 text-ink hover:brightness-95">{t("Como funciona o atacado")}</Link>
                   <a href={waLink(settings.whatsapp ?? "", "Olá! Tenho interesse em comprar no atacado.")} target="_blank" rel="noreferrer" className="btn bg-[#25d366] px-6 py-3 text-white">{t("💬 Falar com o atacado")}</a>
                 </div>
               </div>
             </section>
 
-            {/* ======================= DELIVERY + STORE INFO ======================= */}
+            {/* ======================= HOW IT WORKS + STORE INFO ======================= */}
             <section className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-[26px] border-2 border-line bg-surface p-6">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-sky/15 text-2xl">🚚</span>
-                <h3 className="mt-3 font-display text-xl font-extrabold text-ink">{t("Entrega para todo o Brasil")}</h3>
-                <p className="mt-1 text-sm text-muted">Enviamos para todo o país. Retirada grátis na loja em Goiânia. Frete grátis acima de {brl(Number(settings.freeShippingMinCents ?? 19900))}.</p>
+                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-sky/15 text-2xl">🛒</span>
+                <h3 className="mt-3 font-display text-xl font-extrabold text-ink">{t("Peça pelo site, combine no WhatsApp")}</h3>
+                <p className="mt-1 text-sm text-muted">Monte seu carrinho e envie o pedido com nome e WhatsApp. A gente entra em contato para combinar o pagamento e a retirada ou entrega.</p>
                 <Link to="/produtos" className="mt-3 inline-block font-bold text-brand-dark">Começar a comprar →</Link>
               </div>
               <div className="rounded-[26px] border-2 border-line bg-surface p-6">

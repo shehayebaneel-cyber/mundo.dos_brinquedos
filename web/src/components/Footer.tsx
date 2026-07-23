@@ -22,7 +22,7 @@ export function Footer() {
             <li>✉️ {settings.email}</li>
             <li><Link to="/contato" className="hover:text-white">{t("Fale conosco")}</Link></li>
             <li><Link to="/faq" className="hover:text-white">{t("Perguntas frequentes")}</Link></li>
-            <li><Link to="/rastrear" className="hover:text-white">{t("Rastrear pedido")}</Link></li>
+            <li><Link to="/conta" className="hover:text-white">{t("Minha conta")}</Link></li>
           </ul>
         </div>
         <div>
@@ -30,7 +30,6 @@ export function Footer() {
           <ul className="mt-2 space-y-1.5">
             <li><Link to="/sobre" className="hover:text-white">{t("Sobre nós")}</Link></li>
             <li><Link to="/atacado" className="hover:text-white">{t("Atacado")}</Link></li>
-            <li><Link to="/entrega" className="hover:text-white">{t("Entrega e frete")}</Link></li>
             <li><Link to="/trocas" className="hover:text-white">{t("Trocas e devoluções")}</Link></li>
             <li><Link to="/privacidade" className="hover:text-white">{t("Privacidade (LGPD)")}</Link></li>
             <li><Link to="/termos" className="hover:text-white">{t("Termos de uso")}</Link></li>
