@@ -244,13 +244,7 @@ function FilterPanel({
     <div className="space-y-5 text-sm">
       {facets.subcats.length > 0 && (
         <Group title={t("Subcategoria")}>
-          <div className="flex flex-wrap gap-2">
-            {facets.subcats.map((s) => (
-              <button key={s} onClick={() => upd({ subcats: toggleIn(f.subcats, s) })} className={`rounded-full border px-3 py-1.5 text-xs font-bold ${f.subcats.includes(s) ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink hover:border-brand/40"}`}>
-                {s}
-              </button>
-            ))}
-          </div>
+          <SubcatChips subcats={facets.subcats} selected={f.subcats} onToggle={(s) => upd({ subcats: toggleIn(f.subcats, s) })} t={t} />
         </Group>
       )}
 
@@ -348,6 +342,27 @@ function Soon({ t }: { t: (s: string) => string }) {
   return <p className="text-xs text-muted">{t("Em breve — em atualização.")}</p>;
 }
 
+function SubcatChips({ subcats, selected, onToggle, t }: { subcats: string[]; selected: string[]; onToggle: (s: string) => void; t: (s: string, p?: Record<string, string | number>) => string }) {
+  const [all, setAll] = useState(false);
+  const LIMIT = 8;
+  const ordered = [...subcats].sort((a, b) => (selected.includes(b) ? 1 : 0) - (selected.includes(a) ? 1 : 0) || a.localeCompare(b, "pt"));
+  const shown = all ? ordered : ordered.slice(0, LIMIT);
+  const extra = subcats.length - LIMIT;
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {shown.map((s) => (
+        <button key={s} onClick={() => onToggle(s)} className={`rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors ${selected.includes(s) ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink hover:border-brand/40"}`}>
+          {s}
+        </button>
+      ))}
+      {extra > 0 && (
+        <button onClick={() => setAll((v) => !v)} className="rounded-full px-2.5 py-1 text-xs font-extrabold text-brand-dark hover:underline">
+          {all ? t("Ver menos") : t("+{n} mais", { n: extra })}
+        </button>
+      )}
+    </div>
+  );
+}
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>

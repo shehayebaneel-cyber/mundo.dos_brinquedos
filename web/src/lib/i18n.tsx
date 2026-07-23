@@ -82,6 +82,8 @@ const EN: Record<string, string> = {
   "Ver {n} produtos": "View {n} products",
   "Ver todos os produtos": "See all products",
   "Ver mais produtos": "See more products",
+  "Ver menos": "See less",
+  "+{n} mais": "+{n} more",
   "Mostrando {n} de {m}": "Showing {n} of {m}",
   "Melhor avaliados": "Best rated",
   "Limpar": "Clear",
