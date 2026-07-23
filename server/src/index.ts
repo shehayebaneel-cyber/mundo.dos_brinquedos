@@ -281,6 +281,7 @@ app.get("/api/admin/products", asyncH(async (req, res) => {
   if (q.priceMin) AND.push({ priceCents: { gte: num(q.priceMin) } });
   if (q.priceMax) AND.push({ priceCents: { lte: num(q.priceMax) } });
   if (AND.length) where.AND = AND;
+  if (q.idsOnly) { const rows = await db.product.findMany({ where, select: { id: true } }); return res.json({ ids: rows.map((r) => r.id) }); }
   const s = str(q.sort, "recent");
   const orderBy =
     s === "name" ? { name: "asc" as const } :
@@ -342,6 +343,53 @@ app.patch("/api/admin/products/:id", asyncH(async (req, res) => {
 app.delete("/api/admin/products/:id", asyncH(async (req, res) => {
   await db.product.delete({ where: { id: num(req.params.id) } });
   res.json({ ok: true });
+}));
+// Bulk actions on selected products (ids resolved on the client, incl. "select all filtered")
+app.post("/api/admin/products/bulk", asyncH(async (req, res) => {
+  const b = req.body ?? {};
+  const action = str(b.action);
+  const ids: number[] = Array.isArray(b.ids) ? (b.ids as unknown[]).map((x) => num(x)).filter(Boolean) : [];
+  if (!ids.length) return res.json({ affected: 0 });
+  const where = { id: { in: ids } };
+  const up = (c: number) => res.json({ affected: c });
+  if (action === "setCategory") return up((await db.product.updateMany({ where, data: { categoryId: b.categoryId ? num(b.categoryId) : null } })).count);
+  if (action === "setSubcat") return up((await db.product.updateMany({ where, data: { subcat: str(b.subcat) } })).count);
+  if (action === "setStock") return up((await db.product.updateMany({ where, data: { stock: num(b.stock) } })).count);
+  if (action === "clearPromo") return up((await db.product.updateMany({ where, data: { oldPriceCents: null } })).count);
+  if (action === "delete") return up((await db.product.deleteMany({ where })).count);
+  if (action === "setFlags") {
+    const data: Record<string, boolean> = {};
+    for (const k of ["isNew", "featured", "bestSeller", "active", "wholesaleOnly"]) if (b[k] !== undefined) data[k] = bool(b[k]);
+    return up((await db.product.updateMany({ where, data })).count);
+  }
+  // price-dependent actions — group by priceCents so we do few updateMany calls
+  if (["adjustPrice", "setTier2", "setTier3", "setPromo"].includes(action)) {
+    const rows = await db.product.findMany({ where, select: { id: true, priceCents: true } });
+    const groups: Record<number, number[]> = {};
+    for (const r of rows) (groups[r.priceCents] ??= []).push(r.id);
+    const p = num(b.percent);
+    let affected = 0;
+    for (const [priceStr, gids] of Object.entries(groups)) {
+      const price = Number(priceStr);
+      let data: Record<string, number | null> = {};
+      if (action === "adjustPrice") data = { priceCents: Math.max(0, Math.round(price * (1 + p / 100))) };
+      if (action === "setTier2") data = { price10Cents: Math.max(0, Math.round(price * (1 - Math.abs(p) / 100))) };
+      if (action === "setTier3") data = { wholesaleCents: Math.max(0, Math.round(price * (1 - Math.abs(p) / 100))) };
+      if (action === "setPromo") data = { oldPriceCents: Math.round(price / (1 - Math.min(90, Math.abs(p)) / 100)) };
+      for (let i = 0; i < gids.length; i += 300) affected += (await db.product.updateMany({ where: { id: { in: gids.slice(i, i + 300) } }, data })).count;
+    }
+    return up(affected);
+  }
+  if (action === "duplicate") {
+    const full = await db.product.findMany({ where, include: withMedia });
+    let created = 0;
+    for (const p of full) {
+      await db.product.create({ data: { ...productData({ ...p, slug: `${p.slug}-copia-${Date.now().toString().slice(-5)}-${p.id}`, name: `${p.name} (cópia)` }), images: { create: p.images.map((im, i) => ({ url: im.url, alt: im.alt, sortOrder: i })) } } });
+      created++;
+    }
+    return up(created);
+  }
+  res.status(400).json({ error: "Ação inválida." });
 }));
 
 // ---------- admin: categories ----------
