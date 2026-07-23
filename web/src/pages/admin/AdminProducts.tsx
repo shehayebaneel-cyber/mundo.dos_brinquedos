@@ -25,6 +25,7 @@ export function AdminProducts() {
   const [sel, setSel] = useState<Set<number>>(new Set());
   const [allMatching, setAllMatching] = useState(false);
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   // read state from the URL so it survives returning from an edit
   const get = (k: string, d = "") => sp.get(k) ?? d;
@@ -119,8 +120,10 @@ export function AdminProducts() {
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <h1 className="font-display text-2xl font-extrabold text-ink">{t("Produtos")} <span className="text-muted">({total})</span></h1>
-        <Link to="/admin/produtos/novo" className="btn btn-primary ml-auto px-4 py-2 text-sm">{t("+ Novo produto")}</Link>
+        <button onClick={() => setImporting(true)} className="btn btn-ghost ml-auto px-4 py-2 text-sm">⬆ {t("Importar CSV")}</button>
+        <Link to="/admin/produtos/novo" className="btn btn-primary px-4 py-2 text-sm">{t("+ Novo produto")}</Link>
       </div>
+      {importing && <ImportPanel onClose={() => setImporting(false)} onDone={reload} t={t} />}
 
       {/* search + sort + page size */}
       <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -247,6 +250,99 @@ function pageList(cur: number, total: number): (number | "…")[] {
   }
   return out;
 }
+function parseCsv(text: string): Record<string, string>[] {
+  const rows: string[][] = []; let field = "", row: string[] = [], inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) { if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQ = false; } else field += c; }
+    else if (c === '"') inQ = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; if (field !== "" || row.length) { row.push(field); rows.push(row); row = []; field = ""; } }
+    else field += c;
+  }
+  if (field !== "" || row.length) { row.push(field); rows.push(row); }
+  const header = (rows.shift() ?? []).map((h) => h.replace(/^﻿/, "").trim().toLowerCase());
+  return rows.filter((r) => r.some((x) => x.trim())).map((r) => Object.fromEntries(header.map((h, i) => [h, (r[i] ?? "").trim()])));
+}
+
+type Review = { summary: { create: number; update: number; duplicate: number; error: number }; results: { row: number; action: string; name: string; msg?: string }[]; total: number };
+
+function ImportPanel({ onClose, onDone, t }: { onClose: () => void; onDone: () => void; t: (s: string, p?: Record<string, string | number>) => string }) {
+  const [rows, setRows] = useState<Record<string, string>[]>([]);
+  const [review, setReview] = useState<Review | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState<Review | null>(null);
+  const [fileName, setFileName] = useState("");
+
+  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return;
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const parsed = parseCsv(String(reader.result));
+      setRows(parsed); setDone(null); setReview(null);
+      if (parsed.length) { setBusy(true); try { setReview(await api.aPost<Review>("/api/admin/products/import", { rows: parsed, dry: true })); } finally { setBusy(false); } }
+    };
+    reader.readAsText(file);
+  }
+  async function apply() {
+    setBusy(true);
+    try { const r = await api.aPost<Review>("/api/admin/products/import", { rows, dry: false }); setDone(r); onDone(); } finally { setBusy(false); }
+  }
+  const tone: Record<string, string> = { create: "text-pix", update: "text-sky", duplicate: "text-warn", error: "text-danger" };
+  const label: Record<string, string> = { create: t("Criar"), update: t("Atualizar"), duplicate: t("Duplicado"), error: t("Erro") };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4" onClick={onClose}>
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-2xl bg-surface p-5 sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl font-extrabold text-ink">⬆ {t("Importar produtos (CSV)")}</h2>
+          <button onClick={onClose} className="text-xl">✕</button>
+        </div>
+        <p className="mt-1 text-sm text-muted">{t("Use o mesmo formato do arquivo exportado. Colunas: nome, codigo, categoria, subcategoria, preco, preco10, atacado, estoque, ativo, novo, destaque, top, imagem.")}</p>
+
+        <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand bg-brand-soft/30 p-6 text-sm font-bold text-brand-dark">
+          <input type="file" accept=".csv,text/csv" onChange={onFile} className="hidden" />
+          📄 {fileName || t("Escolher arquivo CSV")}
+        </label>
+
+        {busy && !done && <p className="mt-3 text-center text-sm text-muted">{t("Analisando…")}</p>}
+
+        {review && !done && (
+          <div className="mt-4">
+            <div className="flex flex-wrap gap-2 text-sm font-bold">
+              <span className="rounded-full bg-pix/10 px-3 py-1 text-pix">{t("Criar")}: {review.summary.create}</span>
+              <span className="rounded-full bg-sky/10 px-3 py-1 text-sky">{t("Atualizar")}: {review.summary.update}</span>
+              <span className="rounded-full bg-warn/10 px-3 py-1 text-warn">{t("Duplicados")}: {review.summary.duplicate}</span>
+              <span className="rounded-full bg-danger/10 px-3 py-1 text-danger">{t("Erros")}: {review.summary.error}</span>
+            </div>
+            <div className="mt-3 max-h-56 overflow-y-auto rounded-xl border border-line text-sm">
+              {review.results.slice(0, 200).map((r) => (
+                <div key={r.row} className="flex items-center gap-2 border-b border-line px-3 py-1.5 last:border-0">
+                  <span className={`w-16 shrink-0 text-xs font-bold ${tone[r.action]}`}>{label[r.action]}</span>
+                  <span className="truncate text-ink">{r.name || `linha ${r.row}`}</span>
+                  {r.msg && <span className="ml-auto shrink-0 text-xs text-muted">{r.msg}</span>}
+                </div>
+              ))}
+            </div>
+            <button onClick={apply} disabled={busy} className="btn btn-primary mt-4 w-full py-3 disabled:opacity-60">
+              {busy ? t("Importando…") : t("Confirmar importação ({n} itens)", { n: review.summary.create + review.summary.update })}
+            </button>
+          </div>
+        )}
+
+        {done && (
+          <div className="mt-4 rounded-xl bg-pix/10 p-4 text-center">
+            <p className="font-bold text-pix">✓ {t("Importação concluída!")}</p>
+            <p className="mt-1 text-sm text-ink">{t("{c} criados · {u} atualizados · {d} ignorados", { c: done.summary.create, u: done.summary.update, d: done.summary.duplicate })}</p>
+            <button onClick={onClose} className="btn btn-ghost mt-3 px-5 py-2">{t("Fechar")}</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function NumCell({ value, cents, nullable, onSave, className = "" }: { value: number | null; cents?: boolean; nullable?: boolean; onSave: (v: number | null) => void; className?: string }) {
   const [editing, setEditing] = useState(false);
   const [v, setV] = useState("");

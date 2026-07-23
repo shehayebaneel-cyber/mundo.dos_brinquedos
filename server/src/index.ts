@@ -412,6 +412,55 @@ app.post("/api/admin/products/bulk", asyncH(async (req, res) => {
   }
   res.status(400).json({ error: "Ação inválida." });
 }));
+// CSV/Excel import — send parsed rows; dry=true returns a review (create/update/skip/duplicate), else applies.
+app.post("/api/admin/products/import", asyncH(async (req, res) => {
+  const b = req.body ?? {};
+  const rows: Record<string, unknown>[] = Array.isArray(b.rows) ? b.rows : [];
+  const dry = bool(b.dry);
+  const skipDup = b.skipDuplicates === undefined ? true : bool(b.skipDuplicates);
+  const cats = await db.category.findMany({ select: { id: true, slug: true, name: true } });
+  const catBy = (v: string) => { const s = v.trim().toLowerCase(); return cats.find((c) => c.slug.toLowerCase() === s || c.name.toLowerCase() === s)?.id ?? null; };
+  const truthy = (v: unknown) => ["true", "1", "sim", "yes", "verdadeiro", "x", "y"].includes(String(v ?? "").toLowerCase().trim());
+  const money = (v: unknown) => { const n = parseFloat(String(v ?? "").replace(/[^0-9.,-]/g, "").replace(",", ".")); return isNaN(n) ? null : Math.round(n * 100); };
+  const slugify = (s: string, extra: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 50) + "-" + extra;
+  const results: { row: number; action: string; name: string; id?: number; msg?: string }[] = [];
+  const summary = { create: 0, update: 0, duplicate: 0, error: 0 };
+  let i = 0;
+  for (const r of rows) {
+    i++;
+    const name = str(r.nome ?? r.name).trim();
+    if (!name) { results.push({ row: i, action: "error", name: "", msg: "Sem nome" }); summary.error++; continue; }
+    const priceCents = money(r.preco ?? r.price);
+    if (priceCents == null) { results.push({ row: i, action: "error", name, msg: "Preço inválido" }); summary.error++; continue; }
+    const sku = str(r.codigo ?? r.sku).trim();
+    const idVal = r.id ? num(r.id) : 0;
+    const data = {
+      name, sku, subcat: str(r.subcategoria ?? r.subcat), categoryId: catBy(str(r.categoria ?? r.category)),
+      priceCents, price10Cents: money(r.preco10), wholesaleCents: money(r.atacado ?? r.wholesale),
+      stock: num(r.estoque ?? r.stock, 0), pixPercent: 10,
+      active: r.ativo === undefined ? true : truthy(r.ativo), isNew: truthy(r.novo), featured: truthy(r.destaque), bestSeller: truthy(r.top ?? r.bestSeller),
+    };
+    // find existing: id → sku → (name = duplicate)
+    let existing = idVal ? await db.product.findUnique({ where: { id: idVal } }) : null;
+    if (!existing && sku) existing = await db.product.findFirst({ where: { sku } });
+    if (existing) {
+      if (!dry) await db.product.update({ where: { id: existing.id }, data });
+      results.push({ row: i, action: "update", name, id: existing.id }); summary.update++; continue;
+    }
+    const byName = await db.product.findFirst({ where: { name: { equals: name, mode: "insensitive" } }, select: { id: true } });
+    if (byName) {
+      summary.duplicate++;
+      if (skipDup) { results.push({ row: i, action: "duplicate", name, id: byName.id, msg: "Nome já existe — ignorado" }); continue; }
+      // treat as new anyway
+    }
+    if (!dry) {
+      const img = str(r.imagem ?? r.image).trim();
+      await db.product.create({ data: { ...data, slug: slugify(name, String(Date.now()).slice(-6) + "-" + i), ...(img ? { images: { create: [{ url: img, alt: name, sortOrder: 0 }] } } : {}) } });
+    }
+    results.push({ row: i, action: "create", name }); summary.create++;
+  }
+  res.json({ summary, results: results.slice(0, 500), total: rows.length });
+}));
 
 // ---------- admin: categories ----------
 app.get("/api/admin/categories", asyncH(async (_req, res) => {
